@@ -1,0 +1,133 @@
+//
+//  NameListViewController.swift
+//  EdenList
+//
+//  Created by Chad Armstrong on 2/19/17.
+//  Copyright © 2017 Edenwaith. All rights reserved.
+//
+
+import UIKit
+
+protocol NameListViewControllerDelegate: class {
+	
+	func nameListUpdated(with name: String, with row: Int)
+	func nameListViewCanceled() // Consider if this is necessary or not
+}
+
+class NameListViewController: UITableViewController {
+
+	var isNewList: Bool = true
+	var rowNumber: Int = -1
+	var listName: String = ""
+	weak var delegate: NameListViewControllerDelegate?
+	@IBOutlet weak var textField: UITextField!
+	
+    override func viewDidLoad() {
+        super.viewDidLoad()
+		setupUI()
+    }
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		// Set up the textfield
+		self.textField.becomeFirstResponder()
+		// Set the text if a listName was specified
+		
+	}
+
+	func setupUI() {
+		// View title
+		if self.isNewList == true {
+			self.navigationItem.title = NSLocalizedString("Add New List", comment: "Add New List")
+		} else {
+			self.navigationItem.title = NSLocalizedString("Edit List Name", comment: "Edit List Name")
+		}
+		
+		// Cancel button
+		let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelAction(sender:)))
+		self.navigationItem.leftBarButtonItem = cancelButton
+		self.navigationItem.leftBarButtonItem?.isEnabled = true
+		
+		// Save button
+		let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveAction(sender:)))
+		self.navigationItem.rightBarButtonItem = saveButton
+		self.navigationItem.rightBarButtonItem?.isEnabled = false
+		
+		// Table view + cell
+		self.tableView.rowHeight = UITableViewAutomaticDimension
+		self.tableView.estimatedRowHeight = 44
+	}
+	
+	// MARK: - IBActions
+	
+	@IBAction func cancelAction(sender: UIBarButtonItem) {
+		self.view.endEditing(true)
+		delegate?.nameListViewCanceled()
+		self.dismiss(animated: true, completion: nil)
+	}
+	
+	@IBAction func saveAction(sender: UIBarButtonItem?) {
+		self.view.endEditing(true)
+		delegate?.nameListUpdated(with: self.listName, with: self.rowNumber)
+		self.dismiss(animated: true, completion: nil)
+	}
+	
+    // MARK: - Table view data source
+
+	/*
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        // #warning Incomplete implementation, return the number of sections
+        return 1
+    }
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        // #warning Incomplete implementation, return the number of rows
+        return 1
+    }
+
+	
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "nameReuseIdentifier", for: indexPath)
+//
+//        // Configure the cell...
+//
+//        return cell
+//    }
+	*/
+}
+
+// MARK: - UITextFieldDelegate Methods
+
+extension NameListViewController: UITextFieldDelegate {
+	
+	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+		
+		if ((textField.text?.characters.count)! + string.characters.count - range.length) > 0 {
+			self.navigationItem.rightBarButtonItem?.isEnabled = true
+		} else {
+			self.navigationItem.rightBarButtonItem?.isEnabled = false
+		}
+		
+		return true
+		
+	}
+	
+	func textFieldShouldClear(_ textField: UITextField) -> Bool {
+		self.navigationItem.rightBarButtonItem?.isEnabled = false
+		return true
+	}
+	
+	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+
+		if let text = textField.text {
+			self.listName = text
+		}
+		
+		if self.listName.isEmpty == false {
+			self.saveAction(sender: nil)
+		}
+		
+		return true
+	}
+}

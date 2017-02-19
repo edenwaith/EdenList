@@ -8,7 +8,7 @@
 
 import UIKit
 
-class HomeViewController: UITableViewController { // , NameListViewControllerDelegate {
+class HomeViewController: UITableViewController {
 
 	var records = [String]()
 	let listManager = ListManager.sharedManager
@@ -20,14 +20,18 @@ class HomeViewController: UITableViewController { // , NameListViewControllerDel
 		setupUI()
     }
 
-	// TODO: Create a ListsManager
 	func loadLists() {
 		// Load lists
 		if let listsArray = listManager.lists() as? [String] { // UserDefaults.standard.array(forKey: "Lists") as? [String] {
 			self.records = listsArray
 		} else {
-			self.records = ["Foo", "Bar"]
+			self.records = ["Foo", "Bar"] // TODO: Temp code
+			// TODO: Display empty view
 		}
+	}
+	
+	func saveLists() {
+		
 	}
 	
 	func setupUI() {
@@ -41,13 +45,22 @@ class HomeViewController: UITableViewController { // , NameListViewControllerDel
 		self.tableView.tableFooterView = UIView()
 	}
 	
-	func saveLists() {
-		
-	}
 	
 	@IBAction func addNewList() {
-		self.records.append("Baz")
-		self.tableView.reloadData()
+//		self.records.append("Baz")
+//		self.tableView.reloadData()
+		
+		let storyboard = UIStoryboard(name: "Main", bundle: nil)
+		
+		if let nameListController = storyboard.instantiateViewController(withIdentifier: "nameListViewControllerID") as? NameListViewController {
+			nameListController.isNewList = true
+			nameListController.delegate = self
+			
+			// Need to add a navigation controller to wrap around this VC, since the view is being presented modally
+			let navigationVC = UINavigationController(rootViewController: nameListController)
+			
+			self.navigationController?.present(navigationVC, animated: true, completion: nil)
+		}
 	}
 	
     // MARK: - Table view data source
@@ -111,4 +124,17 @@ class HomeViewController: UITableViewController { // , NameListViewControllerDel
     }
     */
 
+}
+
+// MARK: - NameListViewControllerDelegate Methods
+
+extension HomeViewController: NameListViewControllerDelegate {
+	
+	func nameListUpdated(with name: String, with row: Int) {
+		
+	}
+	
+	func nameListViewCanceled() {
+		
+	}
 }
