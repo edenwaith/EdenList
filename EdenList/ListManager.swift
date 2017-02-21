@@ -18,4 +18,9 @@ class ListManager {
 			return []
 		}
 	}
+	
+	func saveLists(lists: [AnyObject]) {
+		UserDefaults.standard.set(lists, forKey: "Lists")
+		UserDefaults.standard.synchronize()
+	}
 }

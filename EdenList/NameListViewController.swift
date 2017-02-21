@@ -32,8 +32,6 @@ class NameListViewController: UITableViewController {
 		
 		// Set up the textfield
 		self.textField.becomeFirstResponder()
-		// Set the text if a listName was specified
-		
 	}
 
 	func setupUI() {
@@ -57,20 +55,35 @@ class NameListViewController: UITableViewController {
 		// Table view + cell
 		self.tableView.rowHeight = UITableViewAutomaticDimension
 		self.tableView.estimatedRowHeight = 44
+		
+		// Textfield
+		if listName.isEmpty == false {
+			self.textField.text = listName
+			// self.navigationItem.rightBarButtonItem?.isEnabled = true // Maybe not, since we may not want this to be enabled until the title has been changed
+		}
 	}
 	
 	// MARK: - IBActions
 	
 	@IBAction func cancelAction(sender: UIBarButtonItem) {
 		self.view.endEditing(true)
-		delegate?.nameListViewCanceled()
-		self.dismiss(animated: true, completion: nil)
+		
+		self.dismiss(animated: true, completion: {
+			self.delegate?.nameListViewCanceled()
+		})
 	}
 	
 	@IBAction func saveAction(sender: UIBarButtonItem?) {
+		
+		if let text = textField.text {
+			self.listName = text
+		}
+		
 		self.view.endEditing(true)
-		delegate?.nameListUpdated(with: self.listName, with: self.rowNumber)
-		self.dismiss(animated: true, completion: nil)
+		
+		self.dismiss(animated: true, completion: {
+			self.delegate?.nameListUpdated(with: self.listName, with: self.rowNumber)
+		})
 	}
 	
     // MARK: - Table view data source
