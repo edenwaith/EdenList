@@ -16,22 +16,14 @@ class HomeViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-		loadLists()
 		setupUI()
+		
+		// TODO: Check for the most recent list and display that, instead
     }
 
-	func loadLists() {
-		// Load lists
-		if let listsArray = listManager.lists() as? [String], listsArray.count > 0 { // UserDefaults.standard.array(forKey: "Lists") as? [String] {
-			self.records = listsArray
-		} else {
-			self.records = ["Foo", "Bar"] // TODO: Temp code
-			// TODO: Display empty view
-		}
-	}
-	
-	func saveLists() {
-		// listManager.saveLists(self.records)
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		loadLists()
 	}
 	
 	func setupUI() {
@@ -45,6 +37,57 @@ class HomeViewController: UITableViewController {
 		self.tableView.tableFooterView = UIView()
 	}
 	
+	// MARK: - List Methods
+	
+	func loadLists() {
+		// Load lists
+		if let listsArray = listManager.lists() as? [String], listsArray.count > 0 { // UserDefaults.standard.array(forKey: "Lists") as? [String] {
+			self.records = listsArray
+		} else {
+			self.records = []
+		}
+		
+		self.reloadData()
+	}
+	
+	func saveLists() {
+		// listManager.saveLists(self.records)
+	}
+	
+	/// After a change in the table's data, update the appearance.
+	/// If the table is empty, display an appropriate message.
+	/// Enable/disable the Edit button
+	///
+	/// - Parameter forceReload: <#forceReload description#>
+	func reloadData(forceReload: Bool = true) {
+		
+		if forceReload == true {
+			self.tableView.reloadData()
+		}
+		
+		if records.count == 0 {
+			
+			let message = NSLocalizedString("There are no lists available.", comment:"")
+			let messageLabel = UILabel(frame: CGRect(x:0, y:0, width: self.tableView.bounds.size.width, height: self.tableView.bounds.size.height))
+
+			messageLabel.text = message
+			messageLabel.textColor = UIColor.darkGray
+			messageLabel.numberOfLines = 0;
+			messageLabel.textAlignment = .center;
+			messageLabel.font =  UIFont.systemFont(ofSize: 15.0)
+			messageLabel.sizeToFit()
+			
+			self.tableView.backgroundView = messageLabel
+			
+			self.navigationItem.leftBarButtonItem?.isEnabled = false // Disable the Edit button
+			self.tableView.isEditing = false
+			self.navigationController?.isEditing = false
+			
+		} else {
+			self.tableView.backgroundView = nil
+			self.navigationItem.leftBarButtonItem?.isEnabled = true
+		}
+	}
 	
 	@IBAction func addNewList() {
 		
@@ -115,6 +158,7 @@ class HomeViewController: UITableViewController {
             // Delete the row from the data source
 			self.records.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
+			reloadData(forceReload: false)
         }
     }
 
@@ -126,6 +170,7 @@ class HomeViewController: UITableViewController {
 		let record = self.records[fromRow]
 		self.records.remove(at: fromRow)
 		self.records.insert(record, at: toRow)
+		reloadData(forceReload: false)
 		
 		self.saveLists()
     }
@@ -174,7 +219,7 @@ extension HomeViewController: NameListViewControllerDelegate {
 			if nameAlreadyExists == false {
 				self.records.append(name)
 				self.navigationItem.leftBarButtonItem?.isEnabled = true
-				self.tableView.reloadData()
+				self.reloadData()
 				
 				// Scroll to the bottom of the list when a new item has been added.
 				let scrollIndexPath = IndexPath(row: self.records.count - 1, section: 0) // [NSIndexPath indexPathForRow:([records count]-1) inSection:0];
@@ -210,7 +255,7 @@ extension HomeViewController: NameListViewControllerDelegate {
 			}
 			
 			
-			self.tableView.reloadData()
+			self.reloadData()
 			self.saveLists()
 		}
 	}
