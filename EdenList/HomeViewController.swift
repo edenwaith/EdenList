@@ -16,14 +16,15 @@ class HomeViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-		setupUI()
+		self.loadLists()
+		self.setupUI()
 		
 		// TODO: Check for the most recent list and display that, instead
     }
 
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		loadLists()
+		self.reloadData()
 	}
 	
 	func setupUI() {
@@ -41,7 +42,7 @@ class HomeViewController: UITableViewController {
 	
 	func loadLists() {
 		// Load lists
-		if let listsArray = listManager.lists() as? [String], listsArray.count > 0 { // UserDefaults.standard.array(forKey: "Lists") as? [String] {
+		if let listsArray = listManager.lists() as? [String], listsArray.count > 0 {
 			self.records = listsArray
 		} else {
 			self.records = []
@@ -58,7 +59,7 @@ class HomeViewController: UITableViewController {
 	/// If the table is empty, display an appropriate message.
 	/// Enable/disable the Edit button
 	///
-	/// - Parameter forceReload: <#forceReload description#>
+	/// - Parameter forceReload: Option to reload the table's data before determining what to display
 	func reloadData(forceReload: Bool = true) {
 		
 		if forceReload == true {
@@ -179,6 +180,16 @@ class HomeViewController: UITableViewController {
 	
 	func displayListAtIndex(indexPath: IndexPath) {
 		
+		let storyboard = UIStoryboard(name: "Main", bundle: nil)
+		
+		if let listItemController = storyboard.instantiateViewController(withIdentifier: "listItemsViewControllerID") as? ListItemsViewController {
+		
+			let listName = self.records[indexPath.row]
+			listItemController.title = listName
+			// self.saveRecentList(listName) // TODO: Implement saveRecentList
+			
+			self.navigationController?.pushViewController(listItemController, animated: true)
+		}
 	}
 	
 	func checkIfNameExists(name: String) -> Bool {
