@@ -37,9 +37,9 @@ class NameListViewController: UITableViewController {
 	func setupUI() {
 		// View title
 		if self.isNewList == true {
-			self.navigationItem.title = NSLocalizedString("Add New List", comment: "Add New List")
+			self.navigationItem.title = "Add New List".localize()
 		} else {
-			self.navigationItem.title = NSLocalizedString("Edit List Name", comment: "Edit List Name")
+			self.navigationItem.title = "Edit List Name".localize()
 		}
 		
 		// Cancel button

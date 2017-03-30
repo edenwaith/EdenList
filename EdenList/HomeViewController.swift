@@ -32,7 +32,7 @@ class HomeViewController: UITableViewController {
 		let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewList))
 		self.navigationItem.leftBarButtonItem = self.editButtonItem
 		self.navigationItem.rightBarButtonItem = addButton
-		self.navigationItem.title = NSLocalizedString("EdenList", comment:"")
+		self.navigationItem.title = "EdenList".localize()
 		
 		// Don't display empty "cells"
 		self.tableView.tableFooterView = UIView()
@@ -68,7 +68,7 @@ class HomeViewController: UITableViewController {
 		
 		if records.count == 0 {
 			
-			let message = NSLocalizedString("There are no lists available.", comment:"")
+			let message = "There are no lists available.".localize()
 			let messageLabel = UILabel(frame: CGRect(x:0, y:0, width: self.tableView.bounds.size.width, height: self.tableView.bounds.size.height))
 
 			messageLabel.text = message
@@ -121,7 +121,7 @@ class HomeViewController: UITableViewController {
 
         // Configure the cell...
 		cell.textLabel?.text = self.records[indexPath.row]
-		cell.accessibilityHint = NSLocalizedString("Tappable", comment: "Tappable")
+		cell.accessibilityHint = "Tappable".localize()
 
         return cell
     }
@@ -209,18 +209,18 @@ extension HomeViewController: NameListViewControllerDelegate {
 		
 		if nameAlreadyExists == true {
 			
-			let msg = NSLocalizedString("Another list is already using the name \"\(name)\".  Please try another name.", comment: "")
-			let alert = UIAlertController(title: NSLocalizedString("Warning", comment: "Warning"), message: msg, preferredStyle: .alert)
-			let defaultAction = UIAlertAction(title: NSLocalizedString("OK", comment:"OK"), style: .default, handler: nil)
+			let msg = "Another list is already using the name \"\(name)\".  Please try another name.".localize()
+			let alert = UIAlertController(title: "Warning".localize(), message: msg, preferredStyle: .alert)
+			let defaultAction = UIAlertAction(title: "OK".localize(), style: .default, handler: nil)
 			alert.addAction(defaultAction)
 			
 			present(alert, animated: true, completion: nil)
 			
 		} else if trimmedString.characters.count == 0 { // Empty name
 			
-			let msg = NSLocalizedString("The list name cannot be blank.  Please enter in a name for your list", comment: "")
-			let alert = UIAlertController(title: NSLocalizedString("Warning", comment: "Warning"), message: msg, preferredStyle: .alert)
-			let defaultAction = UIAlertAction(title: NSLocalizedString("OK", comment:"OK"), style: .default, handler: nil)
+			let msg = "The list name cannot be blank.  Please enter in a name for your list".localize()
+			let alert = UIAlertController(title: "Warning".localize(), message: msg, preferredStyle: .alert)
+			let defaultAction = UIAlertAction(title: "OK".localize(), style: .default, handler: nil)
 			alert.addAction(defaultAction)
 			
 			present(alert, animated: true, completion: nil)

@@ -40,6 +40,12 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	@IBAction func addItem(_ sender: AnyObject) {
 		
+		let storyboard = UIStoryboard(name: "Main", bundle: nil)
+		
+		if let editItemController = storyboard.instantiateViewController(withIdentifier: "editItemViewControllerID") as? EditItemViewController {
+			editItemController.title = "New Item".localize()
+			self.navigationController?.pushViewController(editItemController, animated: true)
+		}
 	}
 	
 	@IBAction func deleteItems(_ sender: AnyObject) {
