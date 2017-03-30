@@ -10,21 +10,46 @@ import UIKit
 
 class ListItemsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
+	@IBOutlet weak var tableView: UITableView!
+	
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        setupUI()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+	func setupUI() {
+		// Add navigation bar items
+		let actionButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareButtonTapped))
+		actionButtonItem.style = UIBarButtonItemStyle.plain
+		self.navigationItem.rightBarButtonItems = [self.editButtonItem, actionButtonItem]
+		
+		self.tableView.tableFooterView = UIView()
+	}
+	
+	// MARK: - IBActions
+	
+	func shareButtonTapped() {
+		let activityItem = self.title // TODO: Change this to the actual file to share
+		let shareVC = UIActivityViewController(activityItems: [activityItem], applicationActivities: nil)
+		self.present(shareVC, animated: true, completion: nil)
+	}
+	
+	@IBAction func addItem(_ sender: AnyObject) {
+		
+	}
+	
+	@IBAction func deleteItems(_ sender: AnyObject) {
+		
+	}
 
+	@IBAction func organizationChanged(_ sender: AnyObject) {
+		
+	}
+	
     // MARK: - Table view data source
 
     func numberOfSections(in tableView: UITableView) -> Int {
