@@ -17,6 +17,8 @@
 		8445F61A1E6377110020744F /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8445F6191E6377110020744F /* ListItem.swift */; };
 		8445F61B1E6377110020744F /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8445F6191E6377110020744F /* ListItem.swift */; };
 		8445F61C1E6377110020744F /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8445F6191E6377110020744F /* ListItem.swift */; };
+		8469E58F1E8DE47F00BC28B3 /* EditItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8469E58E1E8DE47F00BC28B3 /* EditItemTableViewCell.swift */; };
+		8469E5901E8DE47F00BC28B3 /* EditItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8469E58E1E8DE47F00BC28B3 /* EditItemTableViewCell.swift */; };
 		8492951B1E8CA59100AD3D45 /* String+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8492951A1E8CA59100AD3D45 /* String+Utils.swift */; };
 		8492951C1E8CA59100AD3D45 /* String+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8492951A1E8CA59100AD3D45 /* String+Utils.swift */; };
 		8492951D1E8CA59100AD3D45 /* String+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8492951A1E8CA59100AD3D45 /* String+Utils.swift */; };
@@ -62,6 +64,7 @@
 		842CF6531E540E7200BA2CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		842CF65F1E54135700BA2CDD /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		8445F6191E6377110020744F /* ListItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListItem.swift; sourceTree = "<group>"; };
+		8469E58E1E8DE47F00BC28B3 /* EditItemTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EditItemTableViewCell.swift; path = Views/EditItemTableViewCell.swift; sourceTree = "<group>"; };
 		8492951A1E8CA59100AD3D45 /* String+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String+Utils.swift"; path = "Extensions/String+Utils.swift"; sourceTree = "<group>"; };
 		8498E78C1E5A26A80090AB93 /* NameListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NameListViewController.swift; sourceTree = "<group>"; };
 		84F1861A1E5E978200145007 /* ListItemsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListItemsViewController.swift; sourceTree = "<group>"; };
@@ -151,6 +154,7 @@
 				849295181E8CA55900AD3D45 /* Managers */,
 				849295171E8CA55300AD3D45 /* Models */,
 				849295161E8CA53100AD3D45 /* View Controllers */,
+				8469E58D1E8DE44F00BC28B3 /* Views */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -162,6 +166,14 @@
 				842CF6351E540E7200BA2CDD /* Main.storyboard */,
 			);
 			name = Storyboards;
+			sourceTree = "<group>";
+		};
+		8469E58D1E8DE44F00BC28B3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				8469E58E1E8DE47F00BC28B3 /* EditItemTableViewCell.swift */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 		849295161E8CA53100AD3D45 /* View Controllers */ = {
@@ -343,6 +355,7 @@
 				842CF6321E540E7200BA2CDD /* AppDelegate.swift in Sources */,
 				84F1861B1E5E978200145007 /* ListItemsViewController.swift in Sources */,
 				842CF6601E54135700BA2CDD /* HomeViewController.swift in Sources */,
+				8469E58F1E8DE47F00BC28B3 /* EditItemTableViewCell.swift in Sources */,
 				84F82C151E56B32E00051C55 /* ListManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -365,6 +378,7 @@
 				8445F61C1E6377110020744F /* ListItem.swift in Sources */,
 				842CF6521E540E7200BA2CDD /* EdenListUITests.swift in Sources */,
 				8492951D1E8CA59100AD3D45 /* String+Utils.swift in Sources */,
+				8469E5901E8DE47F00BC28B3 /* EditItemTableViewCell.swift in Sources */,
 				84F1861C1E5E978200145007 /* ListItemsViewController.swift in Sources */,
 				8498E78E1E5A26A80090AB93 /* NameListViewController.swift in Sources */,
 				84F1861F1E5E979400145007 /* EditItemViewController.swift in Sources */,

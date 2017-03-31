@@ -20,10 +20,9 @@ class EditItemViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+	func setup() {
+		// Configure navigation bar items
+	}
 
     // MARK: - Table view data source
 
@@ -39,9 +38,14 @@ class EditItemViewController: UITableViewController {
 
 	
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "itemReuseID", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "itemReuseID", for: indexPath) as! EditItemTableViewCell
 
         // Configure the cell...
+		if indexPath.row == 0 {
+			cell.itemLabel.text = "item".localize()
+		} else {
+			cell.itemLabel.text = "notes".localize()
+		}
 
         return cell
     }
