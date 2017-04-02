@@ -15,9 +15,6 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
         setupUI()
     }
 
@@ -44,6 +41,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		if let editItemController = storyboard.instantiateViewController(withIdentifier: "editItemViewControllerID") as? EditItemViewController {
 			editItemController.title = "New Item".localize()
+			editItemController.delegate = self
 			self.navigationController?.pushViewController(editItemController, animated: true)
 		}
 	}
@@ -123,4 +121,17 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
     }
     */
 
+}
+
+// MARK: - EditItemControllerDelegate Methods
+
+extension ListItemsViewController: EditItemControllerDelegate {
+	
+	func addNewItem(item: ListItem) {
+		print("addNewItem: \(item.description())")
+	}
+	
+	func editItem(item: ListItem, at index: Int) {
+		print("editItem: \(item) \(index)")
+	}
 }
