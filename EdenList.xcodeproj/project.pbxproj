@@ -518,9 +518,10 @@
 				DEVELOPMENT_TEAM = 59RQ86687X;
 				INFOPLIST_FILE = EdenList/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.EdenList;
+				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.edenlist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -531,9 +532,10 @@
 				DEVELOPMENT_TEAM = 59RQ86687X;
 				INFOPLIST_FILE = EdenList/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.EdenList;
+				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.edenlist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

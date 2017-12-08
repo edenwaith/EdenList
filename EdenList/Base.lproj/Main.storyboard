@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="bKT-CW-dIN">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="bKT-CW-dIN">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -23,11 +24,11 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7qL-ia-nNi" id="ICi-Us-dDZ">
-                                    <rect key="frame" x="0.0" y="0.0" width="342" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="341" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="QW8-97-gCh">
-                                            <rect key="frame" x="15" y="0.0" width="325" height="43.5"/>
+                                            <rect key="frame" x="16" y="0.0" width="324" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -46,16 +47,12 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Cqp-e4-8EY" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-89" y="64"/>
+            <point key="canvasLocation" x="178" y="63"/>
         </scene>
         <!--List Items View Controller-->
         <scene sceneID="Efg-gH-IaQ">
             <objects>
                 <viewController storyboardIdentifier="listItemsViewControllerID" id="19i-cR-fbc" customClass="ListItemsViewController" customModule="EdenList" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="csT-hL-Bvr"/>
-                        <viewControllerLayoutGuide type="bottom" id="xSS-Av-cCy"/>
-                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="9Ph-M4-slt">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -64,11 +61,11 @@
                                 <rect key="frame" x="0.0" y="20" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="listItemReuseID" textLabel="1m9-hA-3JH" detailTextLabel="ROs-Tm-pGZ" style="IBUITableViewCellStyleSubtitle" id="6RF-eh-egS">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="detailButton" indentationWidth="10" reuseIdentifier="listItemReuseID" textLabel="1m9-hA-3JH" detailTextLabel="ROs-Tm-pGZ" style="IBUITableViewCellStyleSubtitle" id="6RF-eh-egS">
                                         <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="6RF-eh-egS" id="FLT-Ou-Ieo">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="328" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1m9-hA-3JH">
@@ -105,7 +102,7 @@
                                     <barButtonItem systemItem="flexibleSpace" id="6Rr-VR-iS8"/>
                                     <barButtonItem style="plain" id="K51-IX-dcs">
                                         <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="iO0-qT-WGp">
-                                            <rect key="frame" x="107" y="7" width="161" height="30"/>
+                                            <rect key="frame" x="104" y="7" width="167" height="30"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <segments>
                                                 <segment title="All"/>
@@ -128,13 +125,14 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="bottomMargin" secondItem="nhE-IV-x4S" secondAttribute="bottom" id="89e-w6-owR"/>
-                            <constraint firstItem="oBJ-CJ-BtA" firstAttribute="top" secondItem="9Ph-M4-slt" secondAttribute="topMargin" constant="20" id="E7O-NF-Uhu"/>
-                            <constraint firstAttribute="trailing" secondItem="oBJ-CJ-BtA" secondAttribute="trailing" id="NW2-HA-maN"/>
+                            <constraint firstItem="oBJ-CJ-BtA" firstAttribute="top" secondItem="9Ph-M4-slt" secondAttribute="topMargin" id="E7O-NF-Uhu"/>
+                            <constraint firstItem="RTY-3E-awi" firstAttribute="trailing" secondItem="oBJ-CJ-BtA" secondAttribute="trailing" id="NW2-HA-maN"/>
                             <constraint firstItem="nhE-IV-x4S" firstAttribute="top" secondItem="oBJ-CJ-BtA" secondAttribute="bottom" id="UFh-UE-R2z"/>
-                            <constraint firstAttribute="trailing" secondItem="nhE-IV-x4S" secondAttribute="trailing" id="mkv-b9-AwF"/>
-                            <constraint firstItem="nhE-IV-x4S" firstAttribute="leading" secondItem="9Ph-M4-slt" secondAttribute="leading" id="qgs-rX-t2J"/>
-                            <constraint firstItem="oBJ-CJ-BtA" firstAttribute="leading" secondItem="9Ph-M4-slt" secondAttribute="leading" id="uMS-SA-eCM"/>
+                            <constraint firstItem="RTY-3E-awi" firstAttribute="trailing" secondItem="nhE-IV-x4S" secondAttribute="trailing" id="mkv-b9-AwF"/>
+                            <constraint firstItem="nhE-IV-x4S" firstAttribute="leading" secondItem="RTY-3E-awi" secondAttribute="leading" id="qgs-rX-t2J"/>
+                            <constraint firstItem="oBJ-CJ-BtA" firstAttribute="leading" secondItem="RTY-3E-awi" secondAttribute="leading" id="uMS-SA-eCM"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="RTY-3E-awi"/>
                     </view>
                     <connections>
                         <outlet property="tableView" destination="oBJ-CJ-BtA" id="IY5-OZ-JNt"/>
@@ -142,7 +140,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="l0j-0G-75Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-90" y="814"/>
+            <point key="canvasLocation" x="178" y="757"/>
         </scene>
         <!--Edit Item View Controller-->
         <scene sceneID="6Ph-HF-jjQ">
@@ -199,7 +197,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="E1u-Zs-s1s" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="419" y="814"/>
+            <point key="canvasLocation" x="841" y="757"/>
         </scene>
         <!--Name List View Controller-->
         <scene sceneID="HAe-Kk-iNg">
@@ -253,14 +251,14 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cLY-U2-T1u" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="419" y="64"/>
+            <point key="canvasLocation" x="842" y="63"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="TWR-PZ-eKC">
             <objects>
                 <navigationController id="bKT-CW-dIN" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="0W7-qt-JjL">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
