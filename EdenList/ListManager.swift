@@ -11,15 +11,15 @@ import Foundation
 class ListManager {
 	static let sharedManager = ListManager()
 	
-	func lists() -> [AnyObject] {
-		if let availableLists = UserDefaults.standard.array(forKey: "Lists") as? [AnyObject] {
+	func lists() -> [String] {
+		if let availableLists = UserDefaults.standard.array(forKey: "Lists") as? [String] {
 			return availableLists
 		} else {
 			return []
 		}
 	}
 	
-	func saveLists(lists: [AnyObject]) {
+	func saveLists(lists: [String]) {
 		UserDefaults.standard.set(lists, forKey: "Lists")
 		UserDefaults.standard.synchronize()
 	}

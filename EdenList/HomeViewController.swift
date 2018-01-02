@@ -52,7 +52,7 @@ class HomeViewController: UITableViewController {
 	}
 	
 	func saveLists() {
-		// listManager.saveLists(self.records)
+		listManager.saveLists(lists: self.records)
 	}
 	
 	/// After a change in the table's data, update the appearance.
@@ -160,6 +160,8 @@ class HomeViewController: UITableViewController {
 			self.records.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
 			reloadData(forceReload: false)
+			
+			self.saveLists()
         }
     }
 
