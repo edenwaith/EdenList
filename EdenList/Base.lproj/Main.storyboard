@@ -135,6 +135,7 @@
                         <viewLayoutGuide key="safeArea" id="RTY-3E-awi"/>
                     </view>
                     <connections>
+                        <outlet property="organizationControl" destination="iO0-qT-WGp" id="Vhs-QM-SEZ"/>
                         <outlet property="tableView" destination="oBJ-CJ-BtA" id="IY5-OZ-JNt"/>
                     </connections>
                 </viewController>

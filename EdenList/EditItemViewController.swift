@@ -70,6 +70,7 @@ class EditItemViewController: UITableViewController {
 			self.title = "New Item".localize()
 		} else {
 			self.title = listItem?.itemTitle
+			// TODO: Fill in the text fields
 		}
 		
 		self.setupKeyboardToolbar()
@@ -188,9 +189,11 @@ class EditItemViewController: UITableViewController {
         // Configure the cell...
 		if indexPath.row == EditItemRow.item.rawValue {
 			cell.itemLabel.text = "item".localize()
+			cell.textField.text = self.tempItem?.itemTitle
 			cell.textField.returnKeyType = .next
-		} else {
+		} else { // Notes
 			cell.itemLabel.text = "notes".localize()
+			cell.textField.text = self.tempItem?.itemNotes
 			cell.textField.returnKeyType = .done
 		}
 
