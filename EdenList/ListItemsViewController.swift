@@ -44,6 +44,23 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
     override func viewDidLoad() {
         super.viewDidLoad()
 
+		openFile()
+        setupUI()
+    }
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		self.reloadData()
+	}
+
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		self.saveFile()
+	}
+	
+	// MARK: -
+	
+	func openFile() {
 		let paths: [String] = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
 		let documentsDirectory:String = (paths.first)!
 		
@@ -56,16 +73,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		if FileManager.default.fileExists(atPath: self.filePath) {
 			self.records = self.openFile(filePath: self.filePath)
 		}
-		
-        setupUI()
-    }
-
-	override func viewWillDisappear(_ animated: Bool) {
-		super.viewWillDisappear(animated)
-		self.saveFile()
 	}
-	
-	// MARK: -
 	
 	func setupUI() {
 		// Add navigation bar items
@@ -100,11 +108,54 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	}
 	
 	@IBAction func deleteItems(_ sender: AnyObject) {
-		print("delete items")
+
+		let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+		
+		let deleteAllOption = UIAlertAction(title: "Delete All".localize(), style: .destructive) { (alert: UIAlertAction) -> Void in
+			print("Delete it all!")
+			self.deleteAllItems()
+		}
+		
+		let deleteCheckedOption = UIAlertAction(title: "Delete Checked".localize(), style: .destructive) { (alert: UIAlertAction) -> Void in
+			print("Just delete the checked items")
+			self.deleteCheckedItems()
+		}
+		
+		let deleteUncheckedOption = UIAlertAction(title: "Delete Unchecked".localize(), style: .destructive) { (alert: UIAlertAction) -> Void in
+			print("Just delete the unchecked items")
+			self.deleteUncheckedItems()
+			
+		}
+		
+		alert.addAction(deleteAllOption)
+		alert.addAction(deleteCheckedOption)
+		alert.addAction(deleteUncheckedOption)
+		alert.addAction(UIAlertAction(title: "Cancel".localize(), style: UIAlertActionStyle.cancel, handler: nil))
+		
+		
+		if let popoverPresentationController = alert.popoverPresentationController {
+//			popoverPresentationController.sourceView = self.view
+//			popoverPresentationController.sourceRect = sender.bounds
+			
+			popoverPresentationController.permittedArrowDirections = .down //  .init(rawValue: 0)
+			popoverPresentationController.sourceView = self.view
+			
+			// FIXME: Fix this crash and mis-location of the popover for iPad.
+			// Potential answers to fix this problem: https://stackoverflow.com/questions/14318368/uibarbuttonitem-how-can-i-find-its-frame
+			if  let buttonItemView = sender.value(forKey: "view") as? UIView {
+				// buttonItemView.bounds
+				popoverPresentationController.sourceRect = CGRect(x: buttonItemView.bounds.origin.x, y: buttonItemView.bounds.origin.y, width: 0, height: 0)
+			}
+		}
+		
+		// Display the action sheet
+		present(alert, animated: true) {}
 	}
 
-	@IBAction func organizationChanged(_ sender: AnyObject) {
+	@IBAction func organizationChanged(_ sender: UISegmentedControl) {
 		print("organizationChanged")
+		self.visibilityState = VisibilityState(rawValue: sender.selectedSegmentIndex)!
+		self.updateVisibleRecords()
 	}
 	
     // MARK: - Table view data source
@@ -145,7 +196,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		self.saveFile()
 		
-		self.tableView.reloadData()
+		self.reloadData()
 	}
 	
     // Override to support conditional editing of the table view.
@@ -153,15 +204,40 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
         // Return false if you do not want the specified item to be editable.
         return true
     }
-
-
 	
     // Override to support editing the table view.
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+		
         if editingStyle == .delete {
             // Delete the row from the data source
-            self.tableView.deleteRows(at: [indexPath], with: .fade)
+			let row = indexPath.row
+			
+			if self.visibilityState == .all {
+				
+				self.records.remove(at: row)
+				self.updateVisibleRecords()
+				
+			} else if self.visibilityState == .unchecked {
+				
+				let selectedObject = self.visibleRecords[row]
+				let originalIndex = selectedObject.itemIndex
+				
+				if originalIndex >= 0 {
+					self.records.remove(at: originalIndex)
+				}
+				
+				self.updateVisibleRecords()
+			}
+			
+			if self.visibleRecords.count <= 0 {
+				self.navigationController?.setEditing(false, animated: true)
+				self.editButtonItem.isEnabled = false
+			}
+			
+			self.saveFile()
+			
         } else if editingStyle == .insert {
+			// Currently unused
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
@@ -198,41 +274,129 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	override func setEditing(_ editing: Bool, animated: Bool) {
 		super.setEditing(editing, animated: animated)
 		
-		if records.count > 0 {
-			self.editButtonItem.isEnabled = false
-			self.tableView.setEditing(false, animated: true)
+		if self.records.count > 0 {
+			self.editButtonItem.isEnabled = true
+			self.tableView.setEditing(editing, animated: true)
 		} else {
+			self.editButtonItem.isEnabled = false
 			self.tableView.setEditing(editing, animated: animated)
 		}
-		
 	}
 	
-    /*
+	
     // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+    func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+		
+		let fromRow = fromIndexPath.row
+		let toRow = to.row
+		
+		let originalItem = self.records[fromRow]
+		
+		self.records.remove(at: fromRow)
+		self.records.insert(originalItem, at: toRow)
+		
+		// Update visibleRecords this way, instead of updateVisibleRecords method, which
+		// was causing some visual issues
+		
+		// TODO: Implement this functionality
+//		self.visibleRecords.remove(at: fromRow)
+//		self.visibleRecords.insert(originalItem, at: toRow)
 
+		self.saveFile()
+		
+		/*
+		NSUInteger fromRow = [fromIndexPath row];
+		NSUInteger toRow = [toIndexPath row];
+		
+		id object = [self.records objectAtIndex: fromRow];
+		
+		[self.records removeObjectAtIndex: fromRow];
+		[self.records insertObject: object atIndex: toRow];
+		
+		// Update visibleRecords this way, instead of updateVisibleRecords method, which
+		// was causing some visual issues
+		[self.visibleRecords removeObjectAtIndex: fromRow];
+		[self.visibleRecords insertObject:object atIndex: toRow];
+		
+		
+		[self saveFile];
+		*/
     }
-    */
 
-    /*
     // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
-        return true
+		if self.visibilityState == .all {
+        	return true
+		} else { // Show only unchecked items
+			return false
+		}
     }
-    */
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
+	/// After a change in the table's data, update the appearance.
+	/// If the table is empty, display an appropriate message.
+	/// Enable/disable the Edit button
+	///
+	/// - Parameter forceReload: Option to reload the table's data before determining what to display
+	func reloadData(forceReload: Bool = true) {
+		
+		if forceReload == true {
+			self.tableView.reloadData()
+		}
+		
+		if records.count == 0 {
+			
+			let message = "This list is empty.".localize()
+			let messageLabel = UILabel(frame: CGRect(x:0, y:0, width: self.tableView.bounds.size.width, height: self.tableView.bounds.size.height))
+			
+			messageLabel.text = message
+			messageLabel.textColor = UIColor.darkGray
+			messageLabel.numberOfLines = 0;
+			messageLabel.textAlignment = .center;
+			messageLabel.font =  UIFont.systemFont(ofSize: 15.0)
+			messageLabel.sizeToFit()
+			
+			self.tableView.backgroundView = messageLabel
+			
+			self.editButtonItem.isEnabled = false // Disable the Edit button
+			self.tableView.isEditing = false
+			self.navigationController?.isEditing = false
+			
+		} else {
+			self.tableView.backgroundView = nil
+			self.editButtonItem.isEnabled = true
+		}
+	}
 	
 	// MARK: - Custom Methods
+	
+	func deleteAllItems() {
+		self.records.removeAll()
+		self.updateVisibleRecords()
+	}
+	
+	// Fun side note: The equivalent Objective-C method was 20 lines of code, compared to only 9 here
+	func deleteCheckedItems() {
+		
+		for (index, record) in self.records.reversed().enumerated() {
+			if record.itemChecked == true {
+				self.records.remove(at: index)
+			}
+		}
+		
+		self.updateVisibleRecords()
+	}
+	
+	func deleteUncheckedItems() {
+		
+		for (index, record) in self.records.reversed().enumerated() {
+			if record.itemChecked == false {
+				self.records.remove(at: index)
+			}
+		}
+		
+		self.updateVisibleRecords()
+	}
 	
 	/*
 	- (void) updateVisibleRecords
@@ -296,7 +460,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		} else { // All items
 			
 			for item in self.records {
-				var tempItem:ListItem = item.copy()
+				var tempItem:ListItem = item.copy() // Do I need to perform a copy here?
 				// TODO: Add index value to tempItem
 				self.visibleRecords.append(tempItem)
 			}
@@ -391,7 +555,7 @@ extension ListItemsViewController: EditItemControllerDelegate {
 		// print("addNewItem: \(item.description())")
 		// TODO: Update visible records
 		self.records.append(item)
-		self.tableView.reloadData()
+		self.reloadData()
 		
 		if self.visibleRecords.count > 0 {
 			self.editButtonItem.isEnabled = true
@@ -409,7 +573,7 @@ extension ListItemsViewController: EditItemControllerDelegate {
 		print("editItem: \(item) \(index)")
 		
 		self.records[index] = item
-		self.tableView.reloadData()
+		self.reloadData()
 		
 		// TODO: Update visible records
 		

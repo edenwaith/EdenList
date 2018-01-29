@@ -18,13 +18,38 @@ class HomeViewController: UITableViewController {
 
 		self.loadLists()
 		self.setupUI()
+		self.checkForRecentList()
 		
-		// TODO: Check for the most recent list and display that, instead
+		NotificationCenter.default.addObserver(self,
+											   selector: #selector(self.appWillTerminate(_:)),
+											   name: Notification.Name(rawValue: "appWillTerminateNotification"),
+											   object: nil)
     }
-
+	
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
+		
+		// If returning to this view, save the recent list as an empty string,
+		// which denotes the home screen
+		self.listManager.saveRecentList("")
 		self.reloadData()
+	}
+	
+	deinit {
+		// Unregister for any notifications
+		NotificationCenter.default.removeObserver(self)
+	}
+	
+	// MARK: -
+	
+	
+	/// Save the current lists if the app is being terminated (force quit)
+	/// Note: I doubt this is actually ever being called.  Might want to remove if
+	/// this doesn't seem to ever get called.
+	///
+	/// - Parameter notification: NSNotification being sent from the calling notification
+	@objc func appWillTerminate(_ notification: NSNotification) {
+		self.saveLists()
 	}
 	
 	func setupUI() {
@@ -40,15 +65,53 @@ class HomeViewController: UITableViewController {
 	
 	// MARK: - List Methods
 	
+	/// Load the available lists to display on the main screen
 	func loadLists() {
-		// Load lists
-		if let listsArray = listManager.lists() as? [String], listsArray.count > 0 {
+		
+		let listsArray = listManager.lists()
+		
+		if listsArray.count > 0 {
 			self.records = listsArray
 		} else {
 			self.records = []
 		}
 		
 		self.reloadData()
+	}
+	
+	
+	/// Upon a fresh start, check to see if another list was being viewed.
+	/// If so, display the last viewed list.
+	func checkForRecentList() {
+		
+		let mostRecentList = self.listManager.recentList()
+		
+		if mostRecentList.isEmpty == false {
+			// if FileManager.default.fileExists(atPath: self.filePath)
+			if self.checkIfFileExists(fileName: mostRecentList) {
+				if let index = self.records.index(of: mostRecentList) {
+					let indexPath = IndexPath(row: index, section: 0)
+					self.displayListAtIndex(indexPath: indexPath)
+				}
+			}
+		}
+
+		// TODO: If there are no lists, bring up the modal to create a new list name
+		
+	}
+	
+	// TODO: Should move a lot of this functionality into the list mananger
+	func checkIfFileExists(fileName: String) -> Bool {
+		let paths: [String] = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+		let documentsDirectory:String = (paths.first)!
+		
+		let fileName = fileName + ".edenlist"
+		let writePath = NSURL(fileURLWithPath: documentsDirectory).appendingPathComponent(fileName)
+		let filePath = (writePath?.path)!
+		
+		print("filePath:: \(filePath)")
+		
+		return FileManager.default.fileExists(atPath: filePath)
 	}
 	
 	func saveLists() {
@@ -140,7 +203,7 @@ class HomeViewController: UITableViewController {
 				nameListController.delegate = self
 				nameListController.listName = itemName
 				nameListController.rowNumber = indexPath.row
-			
+				
 				// Need to add a navigation controller to wrap around this VC, since the view is being presented modally
 				let navigationVC = UINavigationController(rootViewController: nameListController)
 				// TODO: Add any additional code which might be needed for larger devices (iPad, iPhone Plus, etc.)
@@ -188,12 +251,17 @@ class HomeViewController: UITableViewController {
 		
 			let listName = self.records[indexPath.row]
 			listItemController.title = listName
-			// self.saveRecentList(listName) // TODO: Implement saveRecentList
+			self.listManager.saveRecentList(listName)
 			
 			self.navigationController?.pushViewController(listItemController, animated: true)
 		}
 	}
 	
+	
+	/// Check if the given name already exists in the current list
+	///
+	/// - Parameter name: Name of list
+	/// - Returns: Boolean value if the given name exists already or not
 	func checkIfNameExists(name: String) -> Bool {
 		return self.records.contains(name)
 	}
