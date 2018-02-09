@@ -18,7 +18,7 @@ class ListItem: NSObject, NSCoding {
 	var itemTitle: String = ""
 	var itemNotes: String = ""
 	var itemChecked: Bool = false
-	var itemIndex: Int = -1	// TODO: Comment what this is used for
+	var itemIndex: Int = -1	// Original index in the records array, used as a unique ID when referencing that item
 	
 	convenience override init() {
 		let emptyData = [String:Any]()

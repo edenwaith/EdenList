@@ -190,7 +190,7 @@ class EditItemViewController: UITableViewController {
 		if indexPath.row == EditItemRow.item.rawValue {
 			cell.itemLabel.text = "item".localize()
 			cell.textField.text = self.tempItem?.itemTitle
-			cell.textField.returnKeyType = .next
+			cell.textField.returnKeyType = .done
 		} else { // Notes
 			cell.itemLabel.text = "notes".localize()
 			cell.textField.text = self.tempItem?.itemNotes
@@ -234,7 +234,7 @@ extension EditItemViewController: UITextFieldDelegate {
 		
 		if textField.tag == EditItemRow.item.rawValue { // Next button
 			textField.resignFirstResponder()
-			self.selectNotesTextField()
+			self.save()
 		} else { // Done button
 			textField.resignFirstResponder()
 			self.save()

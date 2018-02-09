@@ -42,6 +42,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		NotificationCenter.default.post(name: Notification.Name(rawValue: "appWillTerminateNotification"), object: nil)
 	}
 
-
+	func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+		
+		// https://www.infragistics.com/community/blogs/b/stevez/posts/ios-tips-and-tricks-associate-a-file-type-with-your-app-part-3
+		/*
+		NSFileManager *filemgr = [NSFileManager defaultManager];
+		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+		NSString *documentsDirectory = [paths objectAtIndex:0];
+		NSString* inboxPath = [documentsDirectory stringByAppendingPathComponent:@"Inbox"];
+		NSArray *dirFiles = [filemgr contentsOfDirectoryAtPath:inboxPath error:nil];
+		*/
+		
+		// TODO: Steps when importing a file
+		// 1. Verify if another file already exists with that file name
+		// 2. If not, add the new file (copy to proper directory and add to the list
+		// 3. If another file already exists, give the user the option to either merge the new list, rename the new list, or cancel
+		
+		// Ensure that the file is an EdenList document
+		guard url.pathExtension == "edenlist" else {
+			return false
+		}
+		
+		let listName = url.lastPathComponent
+		
+		if ListManager.sharedManager.listExists(listName: listName) == false {
+			ListManager.sharedManager.addNewList(url: url)
+		} else {
+			print("The list \(listName) already exists")
+		}
+		
+		return true // return false if the application failed to open the file
+	}
 }
 
