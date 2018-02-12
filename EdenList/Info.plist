@@ -8,9 +8,14 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeIconFiles</key>
-			<array/>
+			<array>
+				<string>EdenList_Icon_29.png</string>
+				<string>EdenList_Icon_58.png</string>
+				<string>EdenList_Icon_64.png</string>
+				<string>EdenList_Icon_320.png</string>
+			</array>
 			<key>CFBundleTypeName</key>
-			<string>EdenList</string>
+			<string>EdenList File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -37,6 +42,8 @@
 	<string>2.0.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -57,19 +64,22 @@
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>
-				<string>public.content</string>
 				<string>public.archive</string>
 			</array>
 			<key>UTTypeDescription</key>
 			<string>EdenList File</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.edenwaith.edenlist</string>
+			<key>UTTypeSize320IconFile</key>
+			<string>EdenList_Icon_320</string>
+			<key>UTTypeSize64IconFile</key>
+			<string>EdenList_Icon_64</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
-				<array>
-					<string>edenlist</string>
-				</array>
+				<string>edenlist</string>
+				<key>public.mime-type</key>
+				<string>application/edenlist</string>
 			</dict>
 		</dict>
 	</array>

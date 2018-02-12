@@ -44,34 +44,48 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
 		
+		// Import a new list
+		// https://www.raywenderlich.com/133825/uiactivityviewcontroller-tutorial
 		// https://www.infragistics.com/community/blogs/b/stevez/posts/ios-tips-and-tricks-associate-a-file-type-with-your-app-part-3
-		/*
-		NSFileManager *filemgr = [NSFileManager defaultManager];
-		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-		NSString *documentsDirectory = [paths objectAtIndex:0];
-		NSString* inboxPath = [documentsDirectory stringByAppendingPathComponent:@"Inbox"];
-		NSArray *dirFiles = [filemgr contentsOfDirectoryAtPath:inboxPath error:nil];
-		*/
-		
-		// TODO: Steps when importing a file
-		// 1. Verify if another file already exists with that file name
-		// 2. If not, add the new file (copy to proper directory and add to the list
-		// 3. If another file already exists, give the user the option to either merge the new list, rename the new list, or cancel
 		
 		// Ensure that the file is an EdenList document
 		guard url.pathExtension == "edenlist" else {
 			return false
 		}
 		
-		let listName = url.lastPathComponent
+		let listName = url.deletingPathExtension().lastPathComponent
 		
+		// Verify if another file already exists with the same name as listName
 		if ListManager.sharedManager.listExists(listName: listName) == false {
+			// This is a new list
 			ListManager.sharedManager.addNewList(url: url)
+			
+			return navigateToNewList()
+			
 		} else {
-			print("The list \(listName) already exists")
+			// Rename the list, then add it
+			ListManager.sharedManager.addAndRenameNewList(url: url)
+			
+			return navigateToNewList()
+		}
+	}
+	
+	/// Notify the HomeViewController to refresh its list, then go to the new list
+	///
+	/// - Returns: If this can successfully navigate to the imported list, return true.  On a failure, return false.
+	private func navigateToNewList() -> Bool {
+		
+		// Grab the root view controller
+		guard let navigationController = window?.rootViewController as? UINavigationController,
+			let homeViewController = navigationController.viewControllers.first as? HomeViewController else {
+				// If the HomeViewController isn't found, kick out
+				return false
 		}
 		
-		return true // return false if the application failed to open the file
+		// Pop back to the root view controller then tell the HomeViewController to navigate to the new list
+		navigationController.popViewController(animated: false)
+		homeViewController.refreshList()
+		
+		return true
 	}
 }
-

@@ -74,20 +74,21 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	func shareButtonTapped(_ sender: UIBarButtonItem) {
 		
-		let fileTitle = self.title // TODO: Change this to the actual file to share
+		let fileTitle = self.title
 		let fileURL = NSURL(fileURLWithPath: self.filePath)
 		
-		let excludedTypes:[UIActivityType] = [.postToFacebook, .postToTwitter, .postToVimeo, .postToWeibo, .postToFlickr, .addToReadingList]
+		let excludedTypes:[UIActivityType] = [.postToFacebook, .postToTwitter, .postToVimeo, .postToWeibo, .postToFlickr, .addToReadingList, .assignToContact, .saveToCameraRoll]
 		let shareVC = UIActivityViewController(activityItems: [fileTitle, fileURL], applicationActivities: nil)
 		shareVC.excludedActivityTypes = excludedTypes
-		
-		// shareVC.popoverPresentationController?.sourceView = sender
+		shareVC.setValue(fileTitle, forKey: "subject")
 		
 		if let popoverPresentationController = shareVC.popoverPresentationController {
-			popoverPresentationController.barButtonItem = sender // (sender as! UIBarButtonItem)
+			popoverPresentationController.barButtonItem = sender
 		}
 		
-		self.present(shareVC, animated: true, completion: nil)
+		//DispatchQueue.main.async() {
+			self.present(shareVC, animated: true, completion: nil)
+		//}
 		
 	}
 	
@@ -452,7 +453,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		var tempRecords = [ListItem]()
 		
 		if FileManager.default.fileExists(atPath: filePath) {
-			if let fileContents = NSDictionary(contentsOfFile: filePath) { 
+			if let fileContents = NSDictionary(contentsOfFile: filePath) {
 				print("fileContents: \(fileContents)")
 				
 				// File records

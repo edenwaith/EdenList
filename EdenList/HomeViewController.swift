@@ -70,6 +70,8 @@ class HomeViewController: UITableViewController {
 		
 		let listsArray = listManager.lists()
 		
+		self.records.removeAll()
+		
 		if listsArray.count > 0 {
 			self.records = listsArray
 		} else {
@@ -80,6 +82,14 @@ class HomeViewController: UITableViewController {
 	}
 	
 	
+	/// When a new file is imported, refresh this list
+	func refreshList() {
+		self.loadLists()
+		self.tableView.reloadData()
+		self.scrollToBottom()
+		self.checkForRecentList()
+	}
+	
 	/// Upon a fresh start, check to see if another list was being viewed.
 	/// If so, display the last viewed list.
 	func checkForRecentList() {
@@ -87,7 +97,6 @@ class HomeViewController: UITableViewController {
 		let mostRecentList = self.listManager.recentList()
 		
 		if mostRecentList.isEmpty == false {
-			// if FileManager.default.fileExists(atPath: self.filePath)
 			if self.checkIfFileExists(fileName: mostRecentList) {
 				if let index = self.records.index(of: mostRecentList) {
 					let indexPath = IndexPath(row: index, section: 0)
@@ -218,13 +227,18 @@ class HomeViewController: UITableViewController {
 	
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+		
         if editingStyle == .delete {
+			
             // Delete the row from the data source
+			let listName = self.records[indexPath.row]
+			
 			self.records.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
 			reloadData(forceReload: false)
-			
+
 			self.saveLists()
+			ListManager.sharedManager.deleteList(listName: listName)
         }
     }
 
@@ -255,6 +269,12 @@ class HomeViewController: UITableViewController {
 			
 			self.navigationController?.pushViewController(listItemController, animated: true)
 		}
+	}
+	
+	/// After adding a new item to the list, scroll to the bottom of the table view so the new item is visible
+	func scrollToBottom() {
+		let scrollIndexPath: IndexPath = IndexPath.init(row: self.records.count - 1, section: 0)
+		self.tableView.scrollToRow(at: scrollIndexPath, at: .bottom, animated: true)
 	}
 	
 	

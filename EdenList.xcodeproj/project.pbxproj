@@ -28,6 +28,10 @@
 		84F1861C1E5E978200145007 /* ListItemsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1861A1E5E978200145007 /* ListItemsViewController.swift */; };
 		84F1861E1E5E979400145007 /* EditItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1861D1E5E979400145007 /* EditItemViewController.swift */; };
 		84F1861F1E5E979400145007 /* EditItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1861D1E5E979400145007 /* EditItemViewController.swift */; };
+		84F370B6202E60DB00BE467B /* EdenList_Icon_64.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F370B2202E60DB00BE467B /* EdenList_Icon_64.png */; };
+		84F370B7202E60DB00BE467B /* EdenList_Icon_320.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F370B3202E60DB00BE467B /* EdenList_Icon_320.png */; };
+		84F370B8202E60DB00BE467B /* EdenList_Icon_29.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F370B4202E60DB00BE467B /* EdenList_Icon_29.png */; };
+		84F370B9202E60DB00BE467B /* EdenList_Icon_58.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F370B5202E60DB00BE467B /* EdenList_Icon_58.png */; };
 		84F82C151E56B32E00051C55 /* ListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F82C141E56B32E00051C55 /* ListManager.swift */; };
 		84F82C161E56B32E00051C55 /* ListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F82C141E56B32E00051C55 /* ListManager.swift */; };
 /* End PBXBuildFile section */
@@ -69,6 +73,10 @@
 		8498E78C1E5A26A80090AB93 /* NameListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NameListViewController.swift; sourceTree = "<group>"; };
 		84F1861A1E5E978200145007 /* ListItemsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListItemsViewController.swift; sourceTree = "<group>"; };
 		84F1861D1E5E979400145007 /* EditItemViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditItemViewController.swift; sourceTree = "<group>"; };
+		84F370B2202E60DB00BE467B /* EdenList_Icon_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EdenList_Icon_64.png; path = Images/EdenList_Icon_64.png; sourceTree = "<group>"; };
+		84F370B3202E60DB00BE467B /* EdenList_Icon_320.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EdenList_Icon_320.png; path = Images/EdenList_Icon_320.png; sourceTree = "<group>"; };
+		84F370B4202E60DB00BE467B /* EdenList_Icon_29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EdenList_Icon_29.png; path = Images/EdenList_Icon_29.png; sourceTree = "<group>"; };
+		84F370B5202E60DB00BE467B /* EdenList_Icon_58.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = EdenList_Icon_58.png; path = Images/EdenList_Icon_58.png; sourceTree = "<group>"; };
 		84F82C141E56B32E00051C55 /* ListManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -123,6 +131,7 @@
 				8445F61D1E6378730020744F /* Classes */,
 				8445F61E1E63787E0020744F /* Storyboards */,
 				842CF6381E540E7200BA2CDD /* Assets.xcassets */,
+				84F370B1202E60C200BE467B /* Icons */,
 				842CF63D1E540E7200BA2CDD /* Info.plist */,
 			);
 			path = EdenList;
@@ -209,6 +218,17 @@
 				8492951A1E8CA59100AD3D45 /* String+Utils.swift */,
 			);
 			name = Extensions;
+			sourceTree = "<group>";
+		};
+		84F370B1202E60C200BE467B /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				84F370B4202E60DB00BE467B /* EdenList_Icon_29.png */,
+				84F370B5202E60DB00BE467B /* EdenList_Icon_58.png */,
+				84F370B2202E60DB00BE467B /* EdenList_Icon_64.png */,
+				84F370B3202E60DB00BE467B /* EdenList_Icon_320.png */,
+			);
+			name = Icons;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -321,9 +341,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84F370B9202E60DB00BE467B /* EdenList_Icon_58.png in Resources */,
+				84F370B6202E60DB00BE467B /* EdenList_Icon_64.png in Resources */,
+				84F370B7202E60DB00BE467B /* EdenList_Icon_320.png in Resources */,
 				842CF63C1E540E7200BA2CDD /* LaunchScreen.storyboard in Resources */,
 				842CF6391E540E7200BA2CDD /* Assets.xcassets in Resources */,
 				842CF6371E540E7200BA2CDD /* Main.storyboard in Resources */,
+				84F370B8202E60DB00BE467B /* EdenList_Icon_29.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
