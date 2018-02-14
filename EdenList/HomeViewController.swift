@@ -93,34 +93,22 @@ class HomeViewController: UITableViewController {
 	/// Upon a fresh start, check to see if another list was being viewed.
 	/// If so, display the last viewed list.
 	func checkForRecentList() {
-		
+		// Retrieve the name of the most recently viewed list (e.g. "Groceries")
 		let mostRecentList = self.listManager.recentList()
 		
 		if mostRecentList.isEmpty == false {
-			if self.checkIfFileExists(fileName: mostRecentList) {
+			if ListManager.sharedManager.fileExists(fileName: mostRecentList) == true {
 				if let index = self.records.index(of: mostRecentList) {
 					let indexPath = IndexPath(row: index, section: 0)
 					self.displayListAtIndex(indexPath: indexPath)
 				}
 			}
+		} else {
+			// If there are no lists, bring up the modal to create a new list name
+			if records.count == 0 {
+				self.addNewList()
+			}
 		}
-
-		// TODO: If there are no lists, bring up the modal to create a new list name
-		
-	}
-	
-	// TODO: Should move a lot of this functionality into the list mananger
-	func checkIfFileExists(fileName: String) -> Bool {
-		let paths: [String] = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-		let documentsDirectory:String = (paths.first)!
-		
-		let fileName = fileName + ".edenlist"
-		let writePath = NSURL(fileURLWithPath: documentsDirectory).appendingPathComponent(fileName)
-		let filePath = (writePath?.path)!
-		
-		print("filePath:: \(filePath)")
-		
-		return FileManager.default.fileExists(atPath: filePath)
 	}
 	
 	func saveLists() {
@@ -215,7 +203,8 @@ class HomeViewController: UITableViewController {
 				
 				// Need to add a navigation controller to wrap around this VC, since the view is being presented modally
 				let navigationVC = UINavigationController(rootViewController: nameListController)
-				// TODO: Add any additional code which might be needed for larger devices (iPad, iPhone Plus, etc.)
+				// TODO: In a future update, add any additional code which might be needed for larger devices (iPad, iPhone Plus, etc.)
+				// to display this as a modal pop over instead of a new view covering the entire screen.
 				self.navigationController?.present(navigationVC, animated: true, completion: nil)
 			}
 		} else {
@@ -276,16 +265,6 @@ class HomeViewController: UITableViewController {
 		let scrollIndexPath: IndexPath = IndexPath.init(row: self.records.count - 1, section: 0)
 		self.tableView.scrollToRow(at: scrollIndexPath, at: .bottom, animated: true)
 	}
-	
-	
-	/// Check if the given name already exists in the current list
-	///
-	/// - Parameter name: Name of list
-	/// - Returns: Boolean value if the given name exists already or not
-	func checkIfNameExists(name: String) -> Bool {
-		return self.records.contains(name)
-	}
-
 }
 
 // MARK: - NameListViewControllerDelegate Methods
@@ -294,7 +273,7 @@ extension HomeViewController: NameListViewControllerDelegate {
 	
 	func nameListUpdated(with name: String, with row: Int) {
 
-		let nameAlreadyExists = self.checkIfNameExists(name: name)
+		let nameAlreadyExists =  ListManager.sharedManager.listExists(listName: name)
 		let trimmedString = name.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) // trim all whitespace
 		
 		if nameAlreadyExists == true {
@@ -306,7 +285,7 @@ extension HomeViewController: NameListViewControllerDelegate {
 			
 			present(alert, animated: true, completion: nil)
 			
-		} else if trimmedString.characters.count == 0 { // Empty name
+		} else if trimmedString.isEmpty == true { // Empty name
 			
 			let msg = "The list name cannot be blank.  Please enter in a name for your list".localize()
 			let alert = UIAlertController(title: "Warning".localize(), message: msg, preferredStyle: .alert)
@@ -327,9 +306,6 @@ extension HomeViewController: NameListViewControllerDelegate {
 				self.tableView.scrollToRow(at: scrollIndexPath, at: .top, animated: true)
 				
 				self.saveLists()
-				
-				// TODO: Consider whether or not to keep this implementation
-				// self.displayListAtIndex(indexPath: scrollIndexPath)
 			}
 			
 		} else if row >= 0 { // Renaming a list
@@ -337,24 +313,7 @@ extension HomeViewController: NameListViewControllerDelegate {
 			let oldFileName = self.records[row]
 			self.records[row] = name
 			
-			// TODO: Move a majority of this functionality to the ListManager
-			
-			// TODO: Look into using the FileManager, instead
-			let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-			
-			let documentsDirectory: URL = URL(fileURLWithPath:paths.first!)
-			
-			let oldFilePath = documentsDirectory.appendingPathComponent("\(oldFileName).edenlist").path
-			let newFilePath = documentsDirectory.appendingPathComponent("\(name).edenlist").path
-
-			if FileManager.default.fileExists(atPath: oldFilePath) {
-				do {
-					try FileManager.default.moveItem(atPath: oldFilePath, toPath: newFilePath)
-				} catch {
-					print("Could not move paths")
-				}
-			}
-			
+			ListManager.sharedManager.renameList(from: oldFileName, to: name)
 			
 			self.reloadData()
 			self.saveLists()
@@ -362,6 +321,5 @@ extension HomeViewController: NameListViewControllerDelegate {
 	}
 	
 	func nameListViewCanceled() {
-		
 	}
 }

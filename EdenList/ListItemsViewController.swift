@@ -28,6 +28,14 @@ enum ListKey: String {
 	case index 		= "Index"
 }
 
+struct Constants {
+	struct File {
+		static let Version    = "Version"
+		static let Records    = "Records"
+		static let Visibility = "Visibility"
+	}
+}
+
 class ListItemsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
 	@IBOutlet weak var tableView: UITableView!
@@ -362,7 +370,6 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			if record.itemChecked == true {
 				// index is returned sequentially, not in reverse order, so the proper index needs to be calculated
 				let itemIndex = recordsCount - index - 1
-				print("Delete \(record.itemTitle) index:: \(index) itemIndex:: \(itemIndex)")
 				self.records.remove(at: itemIndex)
 			}
 		}
@@ -438,8 +445,6 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		let writePath = NSURL(fileURLWithPath: documentsDirectory).appendingPathComponent(fileName)
 		self.filePath = (writePath?.path)!
 		
-		print("filePath:: \(filePath)")
-		
 		if FileManager.default.fileExists(atPath: self.filePath) {
 			self.records = self.openFile(filePath: self.filePath)
 			self.organizationControl.selectedSegmentIndex = self.visibilityState.rawValue
@@ -454,10 +459,9 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		if FileManager.default.fileExists(atPath: filePath) {
 			if let fileContents = NSDictionary(contentsOfFile: filePath) {
-				print("fileContents: \(fileContents)")
 				
 				// File records
-				if let fileRecords = fileContents["Records"] as? [[String: Any]] {
+				if let fileRecords = fileContents[Constants.File.Records] as? [[String: Any]] {
 					for record in fileRecords {
 						let newRecord = ListItem(data: record)
 						tempRecords.append(newRecord)
@@ -465,7 +469,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 				}
 				
 				// Visibility state
-				if let visibility = fileContents["Visibility"] as? Int {
+				if let visibility = fileContents[Constants.File.Visibility] as? Int {
 					if let tempVisibility = VisibilityState(rawValue: visibility) {
 						self.visibilityState = tempVisibility
 					}
@@ -477,17 +481,13 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	}
 	
 	func saveFile() {
-	
-		// TODO: Create constants/enum/struct, etc. for these keys
 		
 		let fileContents = NSMutableDictionary() //  Dictionary<AnyHashable, Any>()
 		let tempRecords = recordsAsDictionaries()
 		
-		fileContents["Version"] = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")
-		fileContents["Records"] = tempRecords
-		fileContents["Visibility"] = self.visibilityState.rawValue
-		
-		print("fileContents: \(fileContents)")
+		fileContents[Constants.File.Version] = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")
+		fileContents[Constants.File.Records] = tempRecords
+		fileContents[Constants.File.Visibility] = self.visibilityState.rawValue
 		
 		if filePath.isEmpty == false {
 			let success = fileContents.write(toFile: self.filePath, atomically: true)
@@ -506,7 +506,6 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		var tempRecords = [NSDictionary]()
 		
 		for record in self.records {
-			print("record as dictionary: \(record.listItemAsDictionary())")
 			let tempRecord = record.listItemAsDictionary()
 			tempRecords.append(tempRecord)
 		}
@@ -536,11 +535,10 @@ extension ListItemsViewController: EditItemControllerDelegate {
 	}
 	
 	func editItem(item: ListItem, at index: Int) {
-		print("editItem: \(item) \(index)")
 		
 		self.records[index] = item
-		self.updateVisibleRecords()
 		
+		self.updateVisibleRecords()
 		self.saveFile()
 	}
 }

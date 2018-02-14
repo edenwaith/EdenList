@@ -70,7 +70,6 @@ class EditItemViewController: UITableViewController {
 			self.title = "New Item".localize()
 		} else {
 			self.title = listItem?.itemTitle
-			// TODO: Fill in the text fields
 		}
 		
 		self.setupKeyboardToolbar()

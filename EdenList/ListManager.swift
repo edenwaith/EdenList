@@ -42,8 +42,12 @@ class ListManager {
 		UserDefaults.standard.synchronize()
 	}
 	
+	
+	/// Import a new list, add to the available lists and copy into the app's documents directory
+	///
+	/// - Parameter url: URL path of the temporary file, initially stored in the Inbox directory
 	func addNewList(url: URL) {
-		print("url:: \(url)")
+
 		let fileManager = FileManager.default
 		
 		// Extract name of file and strip off the file extension
@@ -55,18 +59,11 @@ class ListManager {
 		let documentsDirectory:String = (paths.first)!
 		
 		if let destinationURL = NSURL(fileURLWithPath: documentsDirectory).appendingPathComponent(fileNameWithExtension) {
-			print("destinationURL:: \(destinationURL)")
-			do {
-				try fileManager.copyItem(at: url, to: destinationURL)
-			} catch {
-				print("Failed to copy \(fileNameWithExtension) to Documents directory")
-			}
 			
-			// Delete the original file from the Inbox folder?
 			do {
-				try fileManager.removeItem(at: url)
+				try fileManager.moveItem(at: url, to: destinationURL)
 			} catch {
-				print("Failed to remove item from Inbox")
+				print("Could not move paths")
 			}
 			
 			// Append the new file name to the list of available files
@@ -81,11 +78,10 @@ class ListManager {
 	
 	/// If a list already exists, rename and add the new list.
 	///
-	/// - Parameter url: URL path of the temporary file, stored in the Inbox directory
+	/// - Parameter url: URL path of the temporary file, initially stored in the Inbox directory
 	func addAndRenameNewList(url: URL) {
 		
 		let listName = url.deletingPathExtension().lastPathComponent
-		print("listName:: \(listName)")
 		var newListName = ""
 		var indexNum: Int = 1
 		
@@ -106,18 +102,11 @@ class ListManager {
 		let documentsDirectory:String = (paths.first)!
 		
 		if let destinationURL = NSURL(fileURLWithPath: documentsDirectory).appendingPathComponent(newFileName) {
-			print("destinationURL:: \(destinationURL)")
+		
 			do {
-				try fileManager.copyItem(at: url, to: destinationURL)
+				try fileManager.moveItem(at: url, to: destinationURL)
 			} catch {
-				print("Failed to copy \(newFileName) to Documents directory")
-			}
-			
-			// Delete the original file from the Inbox folder?
-			do {
-				try fileManager.removeItem(at: url)
-			} catch {
-				print("Failed to remove item from Inbox")
+				print("Could not move paths")
 			}
 			
 			// Append the new file name to the list of available files
@@ -130,16 +119,15 @@ class ListManager {
 	}
 	
 	// Currently unused stub method
-	// Might want to contemplate this....if this is done, will need to ensure that the itemIndex is updated properly
 	func mergeNewList(url: URL) {
 		// Extract name of file
 		// Open up the pre-existing file with the same name
 		// Iterate through the new file and append it's items to the original list
+		// Update itemIndex accordingly for each item
 		// Save out the file
 		// Delete the original file from the Inbox folder
 		
 	}
-	
 	
 	/// Delete the actual file with the name of the listName parameter
 	///
@@ -160,14 +148,50 @@ class ListManager {
 		}
 	}
 	
+	/// When renaming a list, also rename the file
+	///
+	/// - Parameters:
+	///   - oldFileName: Original file name
+	///   - newFileName: New file name
+	func renameList(from oldFileName: String, to newFileName: String) {
+		let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+		let documentsDirectory: URL = URL(fileURLWithPath:paths.first!)
+		
+		let oldFilePath = documentsDirectory.appendingPathComponent("\(oldFileName).edenlist").path
+		let newFilePath = documentsDirectory.appendingPathComponent("\(newFileName).edenlist").path
+		
+		if FileManager.default.fileExists(atPath: oldFilePath) {
+			do {
+				try FileManager.default.moveItem(atPath: oldFilePath, toPath: newFilePath)
+			} catch {
+				print("Could not move paths")
+			}
+		}
+	}
+	
 	/// Check if a list with the given listName already exists
 	///
 	/// - Parameter listName: Name of the list being checked
 	/// - Returns: True if the listName already exists, False if not
 	func listExists(listName: String) -> Bool {
-		
 		let availableLists = self.lists()
-		print("availableLists:: \(availableLists)")
 		return availableLists.contains(listName)
+	}
+	
+	
+	/// Check if a file with the name of fileName exists
+	///
+	/// - Parameter fileName: The name of the file (does not contain the file extension)
+	/// - Returns: Boolean result if the file exists or not
+	func fileExists(fileName: String) -> Bool {
+
+		let paths: [String] = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+		let documentsDirectory:String = (paths.first)!
+		
+		let fileName = fileName + ".edenlist"
+		let writePath = NSURL(fileURLWithPath: documentsDirectory).appendingPathComponent(fileName)
+		let filePath = (writePath?.path)!
+		
+		return FileManager.default.fileExists(atPath: filePath)
 	}
 }
