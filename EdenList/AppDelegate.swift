@@ -38,9 +38,54 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func applicationWillTerminate(_ application: UIApplication) {
-		// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+		// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.		
+		NotificationCenter.default.post(name: Notification.Name(rawValue: "appWillTerminateNotification"), object: nil)
 	}
 
-
+	func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+		
+		// Import a new list
+		// https://www.raywenderlich.com/133825/uiactivityviewcontroller-tutorial
+		// https://www.infragistics.com/community/blogs/b/stevez/posts/ios-tips-and-tricks-associate-a-file-type-with-your-app-part-3
+		
+		// Ensure that the file is an EdenList document
+		guard url.pathExtension == "edenlist" else {
+			return false
+		}
+		
+		let listName = url.deletingPathExtension().lastPathComponent
+		
+		// Verify if another file already exists with the same name as listName
+		if ListManager.sharedManager.listExists(listName: listName) == false {
+			// This is a new list
+			ListManager.sharedManager.addNewList(url: url)
+			
+			return navigateToNewList()
+			
+		} else {
+			// Rename the list, then add it
+			ListManager.sharedManager.addAndRenameNewList(url: url)
+			
+			return navigateToNewList()
+		}
+	}
+	
+	/// Notify the HomeViewController to refresh its list, then go to the new list
+	///
+	/// - Returns: If this can successfully navigate to the imported list, return true.  On a failure, return false.
+	private func navigateToNewList() -> Bool {
+		
+		// Grab the root view controller
+		guard let navigationController = window?.rootViewController as? UINavigationController,
+			let homeViewController = navigationController.viewControllers.first as? HomeViewController else {
+				// If the HomeViewController isn't found, kick out
+				return false
+		}
+		
+		// Pop back to the root view controller then tell the HomeViewController to navigate to the new list
+		navigationController.popViewController(animated: false)
+		homeViewController.refreshList()
+		
+		return true
+	}
 }
-
