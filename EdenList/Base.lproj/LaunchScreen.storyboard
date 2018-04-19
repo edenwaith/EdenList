@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="retina5_9" orientation="portrait">
+    <device id="ipad9_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -16,13 +16,12 @@
             <objects>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="edenlist_blue" translatesAutoresizingMaskIntoConstraints="NO" id="pgn-Dh-nDM">
-                                <rect key="frame" x="62.666666666666657" y="281" width="249.99999999999997" height="250"/>
+                                <rect key="frame" x="200" y="328" width="368" height="368"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="250" id="s9g-Vl-91w"/>
                                     <constraint firstAttribute="width" secondItem="pgn-Dh-nDM" secondAttribute="height" multiplier="1:1" id="uEW-7f-GWA"/>
                                 </constraints>
                             </imageView>
@@ -30,9 +29,35 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="pgn-Dh-nDM" firstAttribute="centerX" secondItem="2II-LP-ei4" secondAttribute="centerX" id="0nb-xI-Ypo"/>
+                            <constraint firstItem="2II-LP-ei4" firstAttribute="bottom" secondItem="pgn-Dh-nDM" secondAttribute="bottom" constant="50" id="Xgp-5e-eob"/>
+                            <constraint firstItem="2II-LP-ei4" firstAttribute="trailing" secondItem="pgn-Dh-nDM" secondAttribute="trailing" constant="200" id="k6m-ry-BjK"/>
                             <constraint firstItem="pgn-Dh-nDM" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="n6o-AG-p4h"/>
+                            <constraint firstItem="pgn-Dh-nDM" firstAttribute="leading" secondItem="2II-LP-ei4" secondAttribute="leading" constant="200" id="nX0-vm-RrN"/>
+                            <constraint firstItem="pgn-Dh-nDM" firstAttribute="top" secondItem="2II-LP-ei4" secondAttribute="top" constant="50" id="suP-1O-bR6"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="2II-LP-ei4"/>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="Xgp-5e-eob"/>
+                                <exclude reference="k6m-ry-BjK"/>
+                                <exclude reference="nX0-vm-RrN"/>
+                                <exclude reference="suP-1O-bR6"/>
+                            </mask>
+                        </variation>
+                        <variation key="heightClass=compact">
+                            <mask key="constraints">
+                                <include reference="Xgp-5e-eob"/>
+                                <exclude reference="k6m-ry-BjK"/>
+                                <exclude reference="nX0-vm-RrN"/>
+                                <include reference="suP-1O-bR6"/>
+                            </mask>
+                        </variation>
+                        <variation key="heightClass=regular-widthClass=regular">
+                            <mask key="constraints">
+                                <include reference="k6m-ry-BjK"/>
+                                <include reference="nX0-vm-RrN"/>
+                            </mask>
+                        </variation>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>

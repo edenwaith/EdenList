@@ -52,6 +52,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
     override func viewDidLoad() {
         super.viewDidLoad()
 
+		// Reference to reorder rows using a long press
+		// https://www.freshconsulting.com/create-drag-and-drop-uitableview-swift/
 		openFile()
         setupUI()
     }
