@@ -77,6 +77,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		self.navigationItem.rightBarButtonItems = [self.editButtonItem, actionButtonItem]
 		
+		self.tableView.rowHeight = UITableViewAutomaticDimension
+		self.tableView.estimatedRowHeight = 44
 		self.tableView.tableFooterView = UIView()
 	}
 	
@@ -144,6 +146,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		present(alert, animated: true) {}
 	}
 
+	/// The All/Unchecked UISegmentedControll was tapped.  Change the visibility state and refresh the table
 	@IBAction func organizationChanged(_ sender: UISegmentedControl) {
 		self.visibilityState = VisibilityState(rawValue: sender.selectedSegmentIndex)!
 		self.updateVisibleRecords()
@@ -414,6 +417,12 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			}
 			
 			self.tableView.reloadSections(IndexSet(integer: 0), with: .fade)
+			
+			// With really long lists, if the refreshed list has its first cell not at the top
+			// or out of the screen's view, scroll the table to the top.
+			if self.tableView.contentOffset.y < 0 {
+				self.tableView.setContentOffset(.zero, animated: true)
+			}
 			
 		} else { // All items
 			

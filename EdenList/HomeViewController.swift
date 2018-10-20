@@ -60,6 +60,8 @@ class HomeViewController: UITableViewController {
 		self.navigationItem.title = "EdenList".localize()
 		
 		// Don't display empty "cells"
+		self.tableView.rowHeight = UITableViewAutomaticDimension
+		self.tableView.estimatedRowHeight = 44
 		self.tableView.tableFooterView = UIView()
 	}
 	
