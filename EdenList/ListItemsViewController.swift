@@ -54,6 +54,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 
 		// Reference to reorder rows using a long press
 		// https://www.freshconsulting.com/create-drag-and-drop-uitableview-swift/
+		// https://github.com/Task-Hero/TaskHero-iOS/blob/master/TaskHero/HomeViewController.swift
 		openFile()
         setupUI()
     }
@@ -90,7 +91,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		let fileURL = NSURL(fileURLWithPath: self.filePath)
 		
 		let excludedTypes:[UIActivityType] = [.postToFacebook, .postToTwitter, .postToVimeo, .postToWeibo, .postToFlickr, .addToReadingList, .assignToContact, .saveToCameraRoll]
-		let shareVC = UIActivityViewController(activityItems: [fileTitle, fileURL], applicationActivities: nil)
+		let shareVC = UIActivityViewController(activityItems: [fileTitle ?? "", fileURL], applicationActivities: nil)
 		shareVC.excludedActivityTypes = excludedTypes
 		shareVC.setValue(fileTitle, forKey: "subject")
 		
@@ -173,7 +174,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 
 		cell.imageView?.image = item.itemChecked ? #imageLiteral(resourceName: "checked") : #imageLiteral(resourceName: "unchecked")
 		cell.accessoryType =  .detailDisclosureButton
-		cell.accessibilityHint = NSLocalizedString("Checked", comment: "Checked")
+		cell.accessibilityHint = "Checked".localize()
 		
         return cell
     }
@@ -366,35 +367,17 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.saveFile()
 	}
 	
-	// Fun side note: The equivalent Objective-C method was 20 lines of code, compared to about half that here
+	// Fun side note: The equivalent Objective-C method was 20 lines of code, compared to about a quarter of that here
 	func deleteCheckedItems() {
-		
-		let recordsCount = self.records.count
-		
-		for (index, record) in self.records.reversed().enumerated() {
-			if record.itemChecked == true {
-				// index is returned sequentially, not in reverse order, so the proper index needs to be calculated
-				let itemIndex = recordsCount - index - 1
-				self.records.remove(at: itemIndex)
-			}
-		}
-		
+		// A nice little trick learned from the Embracing Algorithms WWDC18 video
+		// https://developer.apple.com/videos/play/wwdc2018/223/
+		self.records.removeAll { $0.itemChecked }
 		self.updateVisibleRecords()
 		self.saveFile()
 	}
 	
 	func deleteUncheckedItems() {
-		
-		let recordsCount = self.records.count
-		
-		for (index, record) in self.records.reversed().enumerated() {
-			if record.itemChecked == false {
-				// index is returned sequentially, not in reverse order, so the proper index needs to be calculated
-				let itemIndex = recordsCount - index - 1
-				self.records.remove(at: itemIndex)
-			}
-		}
-		
+		self.records.removeAll { $0.itemChecked == false }
 		self.updateVisibleRecords()
 		self.saveFile()
 	}
@@ -404,11 +387,14 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.visibleRecords.removeAll()
 		
 		if self.visibilityState == .unchecked { // Unchecked items
+			// I initially tried using a filter function, but it caused a bug
+			// if an item was quickly tapped multiple times, which would
+			// duplicate an item.
 			for (index, item) in self.records.enumerated() {
-				
+
 				let tempItem:ListItem = item
 				let checkedStatus = item.itemChecked
-				
+
 				// If the item has not been checked, add it to the visible records
 				if checkedStatus == false {
 					tempItem.itemIndex = index
@@ -420,19 +406,18 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			
 			// With really long lists, if the refreshed list has its first cell not at the top
 			// or out of the screen's view, scroll the table to the top.
+			// If this is not done, then the screen looks blank until the user scrolls
 			if self.tableView.contentOffset.y < 0 {
 				self.tableView.setContentOffset(.zero, animated: true)
 			}
 			
 		} else { // All items
 			
-			for (index, item) in self.records.enumerated() {
-				let tempItem:ListItem = item
-				tempItem.itemIndex = index
-				self.visibleRecords.append(tempItem)
-			}
+			self.visibleRecords = self.records
 			
-			self.tableView.reloadSections(IndexSet(integer: 0), with: .fade)
+			// self.tableView.reloadSections(IndexSet(integer: 0), with: .fade)
+			// Do not use reloadSections since it causes the table to jump and flicker
+			self.tableView.reloadData()
 		}
 		
 		// Enable/disable the Edit button, depending on if there are any visible items
