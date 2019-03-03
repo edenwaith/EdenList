@@ -53,7 +53,7 @@ class NameListViewController: UITableViewController {
 		self.navigationItem.rightBarButtonItem?.isEnabled = false
 		
 		// Table view + cell
-		self.tableView.rowHeight = UITableViewAutomaticDimension
+		self.tableView.rowHeight = UITableView.automaticDimension
 		self.tableView.estimatedRowHeight = 44
 		
 		// Textfield
