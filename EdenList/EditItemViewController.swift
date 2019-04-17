@@ -96,13 +96,13 @@ class EditItemViewController: UITableViewController {
 	}
 	
 	/// Make the Item text field active
-	func selectItemTextField() {
+	@objc func selectItemTextField() {
 		let indexPath = IndexPath(row: 0, section: 0)
 		self.selectTextField(at: indexPath)
 	}
 	
 	/// Make the Notes text field active
-	func selectNotesTextField() {
+	@objc func selectNotesTextField() {
 		let indexPath = IndexPath(row: 1, section: 0)
 		self.selectTextField(at: indexPath)
 	}

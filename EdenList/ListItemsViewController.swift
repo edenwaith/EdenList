@@ -52,6 +52,9 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
     override func viewDidLoad() {
         super.viewDidLoad()
 
+		// Reference to reorder rows using a long press
+		// https://www.freshconsulting.com/create-drag-and-drop-uitableview-swift/
+		// https://github.com/Task-Hero/TaskHero-iOS/blob/master/TaskHero/HomeViewController.swift
 		openFile()
         setupUI()
     }
@@ -71,22 +74,24 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	func setupUI() {
 		// Add navigation bar items
 		let actionButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareButtonTapped))
-		actionButtonItem.style = UIBarButtonItemStyle.plain
+		actionButtonItem.style = UIBarButtonItem.Style.plain
 		
 		self.navigationItem.rightBarButtonItems = [self.editButtonItem, actionButtonItem]
 		
+		self.tableView.rowHeight = UITableView.automaticDimension
+		self.tableView.estimatedRowHeight = 44
 		self.tableView.tableFooterView = UIView()
 	}
 	
 	// MARK: - IBActions
 	
-	func shareButtonTapped(_ sender: UIBarButtonItem) {
+	@objc func shareButtonTapped(_ sender: UIBarButtonItem) {
 		
 		let fileTitle = self.title
 		let fileURL = NSURL(fileURLWithPath: self.filePath)
 		
-		let excludedTypes:[UIActivityType] = [.postToFacebook, .postToTwitter, .postToVimeo, .postToWeibo, .postToFlickr, .addToReadingList, .assignToContact, .saveToCameraRoll]
-		let shareVC = UIActivityViewController(activityItems: [fileTitle, fileURL], applicationActivities: nil)
+		let excludedTypes:[UIActivity.ActivityType] = [.postToFacebook, .postToTwitter, .postToVimeo, .postToWeibo, .postToFlickr, .addToReadingList, .assignToContact, .saveToCameraRoll]
+		let shareVC = UIActivityViewController(activityItems: [fileTitle ?? "", fileURL], applicationActivities: nil)
 		shareVC.excludedActivityTypes = excludedTypes
 		shareVC.setValue(fileTitle, forKey: "subject")
 		
@@ -107,6 +112,15 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		if let editItemController = storyboard.instantiateViewController(withIdentifier: "editItemViewControllerID") as? EditItemViewController {
 			editItemController.title = "New Item".localize()
 			editItemController.delegate = self
+			
+			// This corrects an edge case where the last item was deleted while
+			// the tableView was in edit mode, but when a new item is added, the
+			// table is still in edit mode, even though it was previously set to
+			// not be in edit mode.
+			if self.records.count <= 0 {
+				self.tableView.isEditing = false
+			}
+			
 			self.navigationController?.pushViewController(editItemController, animated: true)
 		}
 	}
@@ -131,7 +145,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		alert.addAction(deleteAllOption)
 		alert.addAction(deleteCheckedOption)
 		alert.addAction(deleteUncheckedOption)
-		alert.addAction(UIAlertAction(title: "Cancel".localize(), style: UIAlertActionStyle.cancel, handler: nil))
+		alert.addAction(UIAlertAction(title: "Cancel".localize(), style: UIAlertAction.Style.cancel, handler: nil))
 		
 		if let popoverPresentationController = alert.popoverPresentationController {
 			// Pop over for larger screens (e.g. iPad)
@@ -142,6 +156,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		present(alert, animated: true) {}
 	}
 
+	/// The All/Unchecked UISegmentedControll was tapped.  Change the visibility state and refresh the table
 	@IBAction func organizationChanged(_ sender: UISegmentedControl) {
 		self.visibilityState = VisibilityState(rawValue: sender.selectedSegmentIndex)!
 		self.updateVisibleRecords()
@@ -168,7 +183,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 
 		cell.imageView?.image = item.itemChecked ? #imageLiteral(resourceName: "checked") : #imageLiteral(resourceName: "unchecked")
 		cell.accessoryType =  .detailDisclosureButton
-		cell.accessibilityHint = NSLocalizedString("Checked", comment: "Checked")
+		cell.accessibilityHint = "Checked".localize()
 		
         return cell
     }
@@ -213,7 +228,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
     }
 	
     // Override to support editing the table view.
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		
         if editingStyle == .delete {
             // Delete the row from the data source
@@ -237,6 +252,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			}
 			
 			if self.visibleRecords.count <= 0 {
+				self.tableView.setEditing(false, animated: true)
 				self.navigationController?.setEditing(false, animated: true)
 				self.editButtonItem.isEnabled = false
 			}
@@ -284,7 +300,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			self.tableView.setEditing(editing, animated: true)
 		} else {
 			self.editButtonItem.isEnabled = false
-			self.tableView.setEditing(editing, animated: animated)
+			self.tableView.setEditing(false, animated: animated)
 		}
 	}
 	
@@ -317,7 +333,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			return false
 		}
     }
-
+	
 	/// After a change in the table's data, update the appearance.
 	/// If the table is empty, display an appropriate message.
 	/// Enable/disable the Edit button
@@ -361,49 +377,34 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.saveFile()
 	}
 	
-	// Fun side note: The equivalent Objective-C method was 20 lines of code, compared to about half that here
+	// Fun side note: The equivalent Objective-C method was 20 lines of code, compared to about a quarter of that here
 	func deleteCheckedItems() {
-		
-		let recordsCount = self.records.count
-		
-		for (index, record) in self.records.reversed().enumerated() {
-			if record.itemChecked == true {
-				// index is returned sequentially, not in reverse order, so the proper index needs to be calculated
-				let itemIndex = recordsCount - index - 1
-				self.records.remove(at: itemIndex)
-			}
-		}
-		
+		// A nice little trick learned from the Embracing Algorithms WWDC18 video
+		// https://developer.apple.com/videos/play/wwdc2018/223/
+		self.records.removeAll { $0.itemChecked }
 		self.updateVisibleRecords()
 		self.saveFile()
 	}
 	
 	func deleteUncheckedItems() {
-		
-		let recordsCount = self.records.count
-		
-		for (index, record) in self.records.reversed().enumerated() {
-			if record.itemChecked == false {
-				// index is returned sequentially, not in reverse order, so the proper index needs to be calculated
-				let itemIndex = recordsCount - index - 1
-				self.records.remove(at: itemIndex)
-			}
-		}
-		
+		self.records.removeAll { $0.itemChecked == false }
 		self.updateVisibleRecords()
 		self.saveFile()
 	}
 	
-	func updateVisibleRecords() {
+	@objc func updateVisibleRecords() {
 		
 		self.visibleRecords.removeAll()
 		
 		if self.visibilityState == .unchecked { // Unchecked items
+			// I initially tried using a filter function, but it caused a bug
+			// if an item was quickly tapped multiple times, which would
+			// duplicate an item.
 			for (index, item) in self.records.enumerated() {
-				
+
 				let tempItem:ListItem = item
 				let checkedStatus = item.itemChecked
-				
+
 				// If the item has not been checked, add it to the visible records
 				if checkedStatus == false {
 					tempItem.itemIndex = index
@@ -413,24 +414,27 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			
 			self.tableView.reloadSections(IndexSet(integer: 0), with: .fade)
 			
-		} else { // All items
-			
-			for (index, item) in self.records.enumerated() {
-				let tempItem:ListItem = item
-				tempItem.itemIndex = index
-				self.visibleRecords.append(tempItem)
+			// With really long lists, if the refreshed list has its first cell not at the top
+			// or out of the screen's view, scroll the table to the top.
+			// If this is not done, then the screen looks blank until the user scrolls
+			if self.tableView.contentOffset.y < 0 {
+				self.tableView.setContentOffset(.zero, animated: true)
 			}
 			
-			self.tableView.reloadSections(IndexSet(integer: 0), with: .fade)
+		} else { // All items
+			
+			self.visibleRecords = self.records
+			
+			// Do not use reloadSections since it causes the table to jump and flicker
+			self.tableView.reloadData()
 		}
 		
-		// Enable/disable the Edit button, depending on if there are any visible items
-		self.editButtonItem.isEnabled = self.visibleRecords.count > 0
+		self.reloadData(forceReload: false)
 	}
 	
 	
 	/// After adding a new item to the list, scroll to the bottom of the table view so the new item is visible
-	func scrollToBottom() {
+	@objc func scrollToBottom() {
 		let scrollIndexPath: IndexPath = IndexPath.init(row: self.visibleRecords.count - 1, section: 0)
 		self.tableView.scrollToRow(at: scrollIndexPath, at: .bottom, animated: true)
 	}
@@ -482,7 +486,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	func saveFile() {
 		
-		let fileContents = NSMutableDictionary() //  Dictionary<AnyHashable, Any>()
+		let fileContents = NSMutableDictionary()
 		let tempRecords = recordsAsDictionaries()
 		
 		fileContents[Constants.File.Version] = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")
@@ -527,7 +531,6 @@ extension ListItemsViewController: EditItemControllerDelegate {
 		if self.visibleRecords.count > 0 {
 			// Scroll to the bottom of the list when a new item has been added.
 			// Use a brief delay to ensure the view has appeared again, then scroll to the bottom
-			// [self performSelector:@selector(scrollToBottom) withObject:nil afterDelay:0.1];
 			self.perform(#selector(scrollToBottom), with: nil, afterDelay: 0.1)
 		}
 		

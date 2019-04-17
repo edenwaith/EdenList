@@ -60,6 +60,8 @@ class HomeViewController: UITableViewController {
 		self.navigationItem.title = "EdenList".localize()
 		
 		// Don't display empty "cells"
+		self.tableView.rowHeight = UITableView.automaticDimension
+		self.tableView.estimatedRowHeight = 44
 		self.tableView.tableFooterView = UIView()
 	}
 	
@@ -215,7 +217,7 @@ class HomeViewController: UITableViewController {
 	// MARK: - Edit Rows
 	
     // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		
         if editingStyle == .delete {
 			

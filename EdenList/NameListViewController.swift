@@ -9,7 +9,6 @@
 import UIKit
 
 protocol NameListViewControllerDelegate: class {
-	
 	func nameListUpdated(with name: String, with row: Int)
 	func nameListViewCanceled() // Consider if this is necessary or not
 }
@@ -20,6 +19,7 @@ class NameListViewController: UITableViewController {
 	var rowNumber: Int = -1
 	var listName: String = ""
 	weak var delegate: NameListViewControllerDelegate?
+	
 	@IBOutlet weak var textField: UITextField!
 	
     override func viewDidLoad() {
@@ -53,7 +53,7 @@ class NameListViewController: UITableViewController {
 		self.navigationItem.rightBarButtonItem?.isEnabled = false
 		
 		// Table view + cell
-		self.tableView.rowHeight = UITableViewAutomaticDimension
+		self.tableView.rowHeight = UITableView.automaticDimension
 		self.tableView.estimatedRowHeight = 44
 		
 		// Textfield
@@ -86,28 +86,6 @@ class NameListViewController: UITableViewController {
 		})
 	}
 	
-    // MARK: - Table view data source
-
-	/*
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 1
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 1
-    }
-
-	
-//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "nameReuseIdentifier", for: indexPath)
-//
-//        // Configure the cell...
-//
-//        return cell
-//    }
-	*/
 }
 
 // MARK: - UITextFieldDelegate Methods
@@ -116,7 +94,9 @@ extension NameListViewController: UITextFieldDelegate {
 	
 	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
 		
-		if ((textField.text?.characters.count)! + string.characters.count - range.length) > 0 {
+		let textFieldCount = textField.text?.count ?? 0
+		
+		if (textFieldCount + string.count - range.length) > 0 {
 			self.navigationItem.rightBarButtonItem?.isEnabled = true
 		} else {
 			self.navigationItem.rightBarButtonItem?.isEnabled = false
