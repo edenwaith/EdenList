@@ -90,8 +90,42 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		let fileTitle = self.title
 		let fileURL = NSURL(fileURLWithPath: self.filePath)
 		
+		// TODO: Need to add an option to print the list.  Need to convert
+		// it into HTML and print that.
+		
+		// Retrieve the print_template.html file and put into a string
+		// Swap out the title with the name of the file to print
+		// Create the table list items
+		
+		// Create the necessary print item to print the HTML code
+		// Add necessary code to the share sheet/options
+		
+		let theHTML = """
+		<html>
+			<head>
+				<title>Print Demo</title>
+			</head>
+		<body>
+			<h1>This is a glorious print demo!</h1>
+		</body>
+		</html>
+		"""
+		
+		let printInfo = UIPrintInfo(dictionary:nil)
+		printInfo.outputType = UIPrintInfo.OutputType.general
+		printInfo.jobName = "print Job"
+		// printController.printInfo = printInfo
+				
+		// 3
+		let formatter = UIMarkupTextPrintFormatter(markupText: theHTML)
+		formatter.perPageContentInsets = UIEdgeInsets(top: 72, left: 72, bottom: 72, right: 72)
+		// printController.printFormatter = formatter
+		
+		// let activityItems = []
+		
 		let excludedTypes:[UIActivity.ActivityType] = [.postToFacebook, .postToTwitter, .postToVimeo, .postToWeibo, .postToFlickr, .addToReadingList, .assignToContact, .saveToCameraRoll]
-		let shareVC = UIActivityViewController(activityItems: [fileTitle ?? "", fileURL], applicationActivities: nil)
+		let shareVC = UIActivityViewController(activityItems: [fileTitle ?? "", fileURL, printInfo, formatter], applicationActivities: nil)
+
 		shareVC.excludedActivityTypes = excludedTypes
 		shareVC.setValue(fileTitle, forKey: "subject")
 		
