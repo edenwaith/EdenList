@@ -131,7 +131,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		printInfo.duplex = .longEdge
 				
 		let formatter = UIMarkupTextPrintFormatter(markupText: htmlContent)
-		formatter.perPageContentInsets = UIEdgeInsets(top: 72, left: 72, bottom: 72, right: 72)
+		formatter.perPageContentInsets = UIEdgeInsets(top: 36, left: 36, bottom: 36, right: 36)
 		
 		let excludedTypes:[UIActivity.ActivityType] = [.postToFacebook, .postToTwitter, .postToVimeo, .postToWeibo, .postToFlickr, .addToReadingList, .assignToContact, .saveToCameraRoll]
 		let shareVC = UIActivityViewController(activityItems: [fileTitle, fileURL, printInfo, formatter], applicationActivities: nil)
