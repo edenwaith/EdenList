@@ -87,11 +87,55 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	@objc func shareButtonTapped(_ sender: UIBarButtonItem) {
 		
-		let fileTitle = self.title
+		let fileTitle = self.title ?? ""
 		let fileURL = NSURL(fileURLWithPath: self.filePath)
 		
+		var htmlContent = ""
+		
+		// Retrieve the print_template.html file and put into a string
+		let templatePath = Bundle.main.path(forResource: "print_template", ofType: "html")
+		
+		do {
+			htmlContent = try String(contentsOfFile:templatePath!, encoding: String.Encoding.utf8)
+			// Swap out the title with the name of the file to print
+			htmlContent = htmlContent.replacingOccurrences(of: "__LIST_TITLE__", with: fileTitle)
+			
+			var itemsHTML = ""
+			
+			// Loop through the records and construct an HTML table for printing
+			for item in self.records {
+				let checkedOption: String = item.itemChecked ? "checked " : ""
+				let itemTemplate = """
+					<tr>
+						<td><input type="checkbox" \(checkedOption)/></td>
+						<td>
+							<h4>\(item.itemTitle)</h4>
+							<h5>\(item.itemNotes)</h4>
+						</td>
+					</tr>
+				"""
+				
+				itemsHTML += itemTemplate
+			}
+			
+			htmlContent = htmlContent.replacingOccurrences(of: "__LIST_ITEMS__", with: itemsHTML)
+			
+		} catch _ as NSError {
+			
+		}
+		
+		let printInfo = UIPrintInfo(dictionary:nil)
+		printInfo.outputType = UIPrintInfo.OutputType.general
+		printInfo.jobName = fileTitle
+		printInfo.orientation = .portrait
+		printInfo.duplex = .longEdge
+				
+		let formatter = UIMarkupTextPrintFormatter(markupText: htmlContent)
+		formatter.perPageContentInsets = UIEdgeInsets(top: 36, left: 36, bottom: 36, right: 36)
+		
 		let excludedTypes:[UIActivity.ActivityType] = [.postToFacebook, .postToTwitter, .postToVimeo, .postToWeibo, .postToFlickr, .addToReadingList, .assignToContact, .saveToCameraRoll]
-		let shareVC = UIActivityViewController(activityItems: [fileTitle ?? "", fileURL], applicationActivities: nil)
+		let shareVC = UIActivityViewController(activityItems: [fileTitle, fileURL, printInfo, formatter], applicationActivities: nil)
+
 		shareVC.excludedActivityTypes = excludedTypes
 		shareVC.setValue(fileTitle, forKey: "subject")
 		
@@ -179,7 +223,9 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
         // Configure the cell...
 		cell.textLabel?.text = item.itemTitle
+		cell.textLabel?.adjustsFontForContentSizeCategory = true
 		cell.detailTextLabel?.text = item.itemNotes
+		cell.detailTextLabel?.adjustsFontForContentSizeCategory = true
 
 		cell.imageView?.image = item.itemChecked ? #imageLiteral(resourceName: "checked") : #imageLiteral(resourceName: "unchecked")
 		cell.accessoryType =  .detailDisclosureButton
@@ -351,10 +397,16 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			let messageLabel = UILabel(frame: CGRect(x:0, y:0, width: self.tableView.bounds.size.width, height: self.tableView.bounds.size.height))
 			
 			messageLabel.text = message
-			messageLabel.textColor = UIColor.darkGray
+			if #available(iOS 13.0, *) {
+				messageLabel.textColor = UIColor.systemGray
+			} else {
+				// Fallback on earlier versions
+				messageLabel.textColor = UIColor.darkGray
+			}
 			messageLabel.numberOfLines = 0;
 			messageLabel.textAlignment = .center;
-			messageLabel.font =  UIFont.systemFont(ofSize: 15.0)
+			messageLabel.font = UIFont.preferredFont(forTextStyle: .body)
+			messageLabel.adjustsFontForContentSizeCategory = true
 			messageLabel.sizeToFit()
 			
 			self.tableView.backgroundView = messageLabel
