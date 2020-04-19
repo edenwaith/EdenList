@@ -16,13 +16,7 @@ class EditItemTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-		
-		if #available(iOS 13.0, *) {
-			itemLabel.textColor = UIColor.link
-		} else {
-			// Fallback on earlier versions
-			itemLabel.textColor = UIColor(red: 0.0, green: 122.0/255.0, blue: 1.0, alpha: 1.0)
-		}
+		itemLabel.textColor = UIColor.customLinkColor
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
