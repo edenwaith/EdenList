@@ -397,12 +397,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			let messageLabel = UILabel(frame: CGRect(x:0, y:0, width: self.tableView.bounds.size.width, height: self.tableView.bounds.size.height))
 			
 			messageLabel.text = message
-			if #available(iOS 13.0, *) {
-				messageLabel.textColor = UIColor.systemGray
-			} else {
-				// Fallback on earlier versions
-				messageLabel.textColor = UIColor.darkGray
-			}
+			messageLabel.textColor = UIColor.customGrey
 			messageLabel.numberOfLines = 0;
 			messageLabel.textAlignment = .center;
 			messageLabel.font = UIFont.preferredFont(forTextStyle: .body)

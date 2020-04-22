@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14865.1" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="bKT-CW-dIN">
-    <device id="retina5_9" orientation="portrait" appearance="dark"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="bKT-CW-dIN">
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14819.2"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,11 +21,11 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7qL-ia-nNi" id="ICi-Us-dDZ">
-                                    <rect key="frame" x="0.0" y="0.0" width="347.66666666666669" height="44"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="QW8-97-gCh">
-                                            <rect key="frame" x="16" y="0.0" width="323.66666666666669" height="44"/>
+                                            <rect key="frame" x="16" y="0.0" width="324" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                             <nil key="textColor"/>
@@ -90,6 +90,7 @@
                             </tableView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nhE-IV-x4S">
                                 <rect key="frame" x="0.0" y="729" width="375" height="49"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <items>
                                     <barButtonItem systemItem="trash" id="eSv-mg-qEd">
                                         <connections>
@@ -119,14 +120,14 @@
                                 </items>
                             </toolbar>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstAttribute="bottomMargin" secondItem="nhE-IV-x4S" secondAttribute="bottom" id="89e-w6-owR"/>
                             <constraint firstItem="oBJ-CJ-BtA" firstAttribute="top" secondItem="9Ph-M4-slt" secondAttribute="topMargin" id="E7O-NF-Uhu"/>
                             <constraint firstItem="RTY-3E-awi" firstAttribute="trailing" secondItem="oBJ-CJ-BtA" secondAttribute="trailing" id="NW2-HA-maN"/>
                             <constraint firstItem="nhE-IV-x4S" firstAttribute="top" secondItem="oBJ-CJ-BtA" secondAttribute="bottom" id="UFh-UE-R2z"/>
-                            <constraint firstItem="RTY-3E-awi" firstAttribute="trailing" secondItem="nhE-IV-x4S" secondAttribute="trailing" id="mkv-b9-AwF"/>
-                            <constraint firstItem="nhE-IV-x4S" firstAttribute="leading" secondItem="RTY-3E-awi" secondAttribute="leading" id="qgs-rX-t2J"/>
+                            <constraint firstAttribute="trailing" secondItem="nhE-IV-x4S" secondAttribute="trailing" id="mkv-b9-AwF"/>
+                            <constraint firstItem="nhE-IV-x4S" firstAttribute="leading" secondItem="9Ph-M4-slt" secondAttribute="leading" id="qgs-rX-t2J"/>
                             <constraint firstItem="oBJ-CJ-BtA" firstAttribute="leading" secondItem="RTY-3E-awi" secondAttribute="leading" id="uMS-SA-eCM"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="RTY-3E-awi"/>
@@ -180,6 +181,7 @@
                                         <constraint firstAttribute="trailing" secondItem="1DV-YC-zwt" secondAttribute="trailing" constant="10" id="rsY-JA-EZb"/>
                                     </constraints>
                                 </tableViewCellContentView>
+                                <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                                 <connections>
                                     <outlet property="itemLabel" destination="ODA-ma-WtS" id="4SO-8w-V2K"/>
                                     <outlet property="textField" destination="1DV-YC-zwt" id="BhD-Ou-fvC"/>
@@ -260,6 +262,7 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="0W7-qt-JjL">
                         <rect key="frame" x="0.0" y="44" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                     </navigationBar>
                     <connections>
                         <segue destination="H5Z-IT-dot" kind="relationship" relationship="rootViewController" id="zO1-iL-0vA"/>
