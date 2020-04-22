@@ -100,7 +100,7 @@ class HomeViewController: UITableViewController {
 		
 		if mostRecentList.isEmpty == false {
 			if ListManager.sharedManager.fileExists(fileName: mostRecentList) == true {
-				if let index = self.records.index(of: mostRecentList) {
+				if let index = self.records.firstIndex(of: mostRecentList) {
 					let indexPath = IndexPath(row: index, section: 0)
 					self.displayListAtIndex(indexPath: indexPath)
 				}

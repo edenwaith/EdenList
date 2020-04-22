@@ -300,13 +300,13 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0820;
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1120;
 				ORGANIZATIONNAME = Edenwaith;
 				TargetAttributes = {
 					842CF62D1E540E7200BA2CDD = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 59RQ86687X;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1120;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
@@ -317,14 +317,14 @@
 					842CF6411E540E7200BA2CDD = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 59RQ86687X;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1120;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 842CF62D1E540E7200BA2CDD;
 					};
 					842CF64C1E540E7200BA2CDD = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 59RQ86687X;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1120;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 842CF62D1E540E7200BA2CDD;
 					};
@@ -332,10 +332,9 @@
 			};
 			buildConfigurationList = 842CF6291E540E7200BA2CDD /* Build configuration list for PBXProject "EdenList" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
@@ -580,7 +579,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.edenlist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -597,7 +596,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.edenlist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -613,7 +612,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.EdenListTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EdenList.app/EdenList";
 			};
 			name = Debug;
@@ -629,7 +628,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.EdenListTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EdenList.app/EdenList";
 			};
 			name = Release;
@@ -644,7 +643,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.EdenListUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_TARGET_NAME = EdenList;
 			};
 			name = Debug;
@@ -659,7 +658,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.EdenListUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_TARGET_NAME = EdenList;
 			};
 			name = Release;
