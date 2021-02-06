@@ -11,11 +11,13 @@ import UIKit
 enum VisibilityState: Int {
 	case all 		= 0
 	case unchecked 	= 1
+	case filtered	= 2
 	
 	init?(rawValue: Int) {
 		switch rawValue {
 		case 0:  self = .all
 		case 1:  self = .unchecked
+		case 2:  self = .filtered
 		default: self = .all
 		}
 	}
@@ -43,9 +45,12 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	var records = [ListItem]()
 	var visibleRecords = [ListItem]()
+	var filteredRecords = [ListItem]()
 	
 	var filePath: String = ""
 	var visibilityState: VisibilityState = .all
+	
+	let searchController = UISearchController(searchResultsController: nil)
 	
 	// MARK: - View Life Cycle
 	
@@ -81,6 +86,14 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.tableView.rowHeight = UITableView.automaticDimension
 		self.tableView.estimatedRowHeight = 44
 		self.tableView.tableFooterView = UIView()
+		
+		// Configure the search controller
+		searchController.searchResultsUpdater = self
+		searchController.dimsBackgroundDuringPresentation = false
+		definesPresentationContext = true
+		tableView.tableHeaderView = searchController.searchBar
+//		searchController.searchBar.tintColor = UIColor.white
+//		searchController.searchBar.barTintColor = UIColor.red
 	}
 	
 	// MARK: - IBActions
@@ -590,5 +603,25 @@ extension ListItemsViewController: EditItemControllerDelegate {
 		
 		self.updateVisibleRecords()
 		self.saveFile()
+	}
+}
+
+// MARK: - UISearchResultsUpdating Methods
+
+extension ListItemsViewController: UISearchResultsUpdating {
+	
+	func updateSearchResults(for searchController: UISearchController) {
+		self.filterSearchResults(for: searchController.searchBar.text ?? "")
+	}
+	
+	func filterSearchResults(for searchText: String)  {
+		// This is a very simplistic method of searching, but it works for now
+		filteredRecords = records.filter { filteredRecord in
+			return filteredRecord.itemTitle.lowercased().contains(searchText.lowercased())
+		}
+		
+		print("filterRecords count: \(filteredRecords.count)")
+		
+		self.tableView.reloadData()
 	}
 }
