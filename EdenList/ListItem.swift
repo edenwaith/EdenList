@@ -25,9 +25,7 @@ class ListItem: NSObject, NSCoding {
 		self.init(data: emptyData)
 	}
 	
-	init(data: [String:Any]) {
-	//	self.init()
-		
+	init(data: [String:Any]) {	
 		itemTitle = data[kToDoKey] as? String ?? ""
 		itemNotes = data[kNotesKey] as? String ?? ""
 		itemChecked = data[kCheckBoxKey] as? Bool ?? false

@@ -52,6 +52,14 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	let searchController = UISearchController(searchResultsController: nil)
 	
+	var isSearchBarEmpty: Bool {
+	  return searchController.searchBar.text?.isEmpty ?? true
+	}
+	
+	var isFiltering: Bool {
+	  return searchController.isActive && !isSearchBarEmpty
+	}
+	
 	// MARK: - View Life Cycle
 	
     override func viewDidLoad() {
@@ -83,17 +91,33 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		self.navigationItem.rightBarButtonItems = [self.editButtonItem, actionButtonItem]
 		
+		// Set up the table view
 		self.tableView.rowHeight = UITableView.automaticDimension
 		self.tableView.estimatedRowHeight = 44
 		self.tableView.tableFooterView = UIView()
 		
 		// Configure the search controller
-		searchController.searchResultsUpdater = self
-		searchController.dimsBackgroundDuringPresentation = false
-		definesPresentationContext = true
-		tableView.tableHeaderView = searchController.searchBar
-//		searchController.searchBar.tintColor = UIColor.white
-//		searchController.searchBar.barTintColor = UIColor.red
+		self.searchController.searchResultsUpdater = self
+		self.searchController.dimsBackgroundDuringPresentation = false
+		self.searchController.searchBar.placeholder = "Search".localize()
+		self.definesPresentationContext = true
+		self.tableView.tableHeaderView = searchController.searchBar
+		
+		// This is 44.0 on iOS 10, but 56.0 on iOS 11 and later due to the search bar being larger
+		let searchBarHeight = self.searchController.searchBar.frame.size.height
+		
+		// Hide the search bar upon initial load of this screen
+		if #available(iOS 11.0, *) {
+			// Change the offset w/i the dispatch queue so this gets properly adjusted on iPhone X-style displays
+			// Reference: https://stackoverflow.com/a/40077398
+			DispatchQueue.main.async {
+				let offset = CGPoint.init(x: 0, y: searchBarHeight)
+				self.tableView.setContentOffset(offset, animated: false)
+			}
+		} else {
+			// For iOS 10, because the above version creates and odd offset for the tableview
+			self.tableView.contentOffset = CGPoint(x: 0, y: searchBarHeight)
+		}
 	}
 	
 	// MARK: - IBActions
@@ -156,6 +180,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			popoverPresentationController.barButtonItem = sender
 		}
 		
+		// If displaying the share sheet is slow, use the dispatch queue
 		//DispatchQueue.main.async() {
 			self.present(shareVC, animated: true, completion: nil)
 		//}
@@ -251,7 +276,19 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		
-		if self.visibilityState == .all {
+		if self.isFiltering == true {
+			
+			let row = indexPath.row
+			let item = self.visibleRecords[row]
+			let tempIndex = item.itemIndex
+			item.itemChecked = !item.itemChecked
+			
+			self.records[tempIndex] = item
+			
+			self.saveFile()
+			self.updateVisibleRecords()
+			
+		} else if self.visibilityState == .all {
 			
 			let row = indexPath.row
 			let item = self.records[row]
@@ -386,7 +423,9 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
     // Override to support conditional rearranging of the table view.
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
-		if self.visibilityState == .all {
+		if self.isFiltering == true {
+			return false
+		} else if self.visibilityState == .all {
         	return true
 		} else { // Show only unchecked items
 			return false
@@ -456,7 +495,14 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		self.visibleRecords.removeAll()
 		
-		if self.visibilityState == .unchecked { // Unchecked items
+		if self.isFiltering == true {
+			// FIXME: I think there is still a potential bug here and need to ensure that
+			// the proper items are being copied over AND that the itemIndex property is
+			// properly set on each item, especially if it was newly created.
+			self.visibleRecords = self.filteredRecords
+			self.tableView.reloadData()
+		}
+		else if self.visibilityState == .unchecked { // Unchecked items
 			// I initially tried using a filter function, but it caused a bug
 			// if an item was quickly tapped multiple times, which would
 			// duplicate an item.
@@ -585,6 +631,8 @@ extension ListItemsViewController: EditItemControllerDelegate {
 	
 	func addNewItem(item: ListItem) {
 
+		item.itemIndex = self.records.count // Set an itemIndex for this new list item
+		
 		self.records.append(item)
 		self.updateVisibleRecords()
 		
@@ -616,12 +664,13 @@ extension ListItemsViewController: UISearchResultsUpdating {
 	
 	func filterSearchResults(for searchText: String)  {
 		// This is a very simplistic method of searching, but it works for now
-		filteredRecords = records.filter { filteredRecord in
+		self.filteredRecords = records.filter { filteredRecord in
 			return filteredRecord.itemTitle.lowercased().contains(searchText.lowercased())
 		}
 		
-		print("filterRecords count: \(filteredRecords.count)")
+		print("filterRecords count: \(self.filteredRecords.count)")
 		
+		self.updateVisibleRecords()
 		self.tableView.reloadData()
 	}
 }
