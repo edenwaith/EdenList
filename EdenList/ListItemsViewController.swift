@@ -45,13 +45,13 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	var records = [ListItem]()
 	var visibleRecords = [ListItem]()
-	var filteredRecords = [ListItem]()
 	
 	var filePath: String = ""
 	var visibilityState: VisibilityState = .all
 	
 	let searchController = UISearchController(searchResultsController: nil)
-	
+    var searchTerm: String = ""
+    
 	var isSearchBarEmpty: Bool {
 	  return searchController.searchBar.text?.isEmpty ?? true
 	}
@@ -276,7 +276,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		
-		if self.isFiltering == true {
+		if self.isFiltering == true { // Filtered/Search results
 			
 			let row = indexPath.row
 			let item = self.visibleRecords[row]
@@ -330,12 +330,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
             // Delete the row from the data source
 			let row = indexPath.row
 			
-			if self.visibilityState == .all {
-				
-				self.records.remove(at: row)
-				self.updateVisibleRecords()
-				
-			} else if self.visibilityState == .unchecked {
+            // When searching or displaying only the Unchecked items
+            if self.isFiltering == true || self.visibilityState == .unchecked {
 				
 				let selectedObject = self.visibleRecords[row]
 				let originalIndex = selectedObject.itemIndex
@@ -345,9 +341,16 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 				}
 				
 				self.updateVisibleRecords()
-			}
+                
+			} else if self.visibilityState == .all {
+                
+                self.records.remove(at: row)
+                self.updateVisibleRecords()
+                
+            }
 			
-			if self.visibleRecords.count <= 0 {
+            // If there are no visible Unchecked records to display, disable the Edit button
+            if self.visibleRecords.count <= 0 && self.isFiltering == false {
 				self.tableView.setEditing(false, animated: true)
 				self.navigationController?.setEditing(false, animated: true)
 				self.editButtonItem.isEnabled = false
@@ -496,10 +499,19 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.visibleRecords.removeAll()
 		
 		if self.isFiltering == true {
-			// FIXME: I think there is still a potential bug here and need to ensure that
-			// the proper items are being copied over AND that the itemIndex property is
-			// properly set on each item, especially if it was newly created.
-			self.visibleRecords = self.filteredRecords
+            
+            for (index, item) in self.records.enumerated() {
+
+                let tempItem:ListItem = item
+                let isFilteredItem = item.itemTitle.lowercased().contains(self.searchTerm.lowercased())
+
+                // If the item contains the search term, add it to the visible records
+                if isFilteredItem == true {
+                    tempItem.itemIndex = index // ensure that the item has the original index
+                    self.visibleRecords.append(tempItem)
+                }
+            }
+            
 			self.tableView.reloadData()
 		}
 		else if self.visibilityState == .unchecked { // Unchecked items
@@ -663,14 +675,7 @@ extension ListItemsViewController: UISearchResultsUpdating {
 	}
 	
 	func filterSearchResults(for searchText: String)  {
-		// This is a very simplistic method of searching, but it works for now
-		self.filteredRecords = records.filter { filteredRecord in
-			return filteredRecord.itemTitle.lowercased().contains(searchText.lowercased())
-		}
-		
-		print("filterRecords count: \(self.filteredRecords.count)")
-		
+        self.searchTerm = searchText
 		self.updateVisibleRecords()
-		self.tableView.reloadData()
 	}
 }
