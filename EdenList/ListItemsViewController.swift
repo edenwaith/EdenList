@@ -369,7 +369,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		var row: Int = indexPath.row
 		let listItem = self.visibleRecords[row]
 		
-		if self.visibilityState == .unchecked {
+        // Select the correct item for filtered and unchecked views
+        if self.isFiltering == true || self.visibilityState == .unchecked {
 			// Send the index of the full records, not just the visible records
 			let item = self.visibleRecords[row]
 			let index = item.itemIndex
