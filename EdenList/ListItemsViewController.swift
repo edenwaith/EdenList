@@ -11,11 +11,13 @@ import UIKit
 enum VisibilityState: Int {
 	case all 		= 0
 	case unchecked 	= 1
+	case filtered	= 2
 	
 	init?(rawValue: Int) {
 		switch rawValue {
 		case 0:  self = .all
 		case 1:  self = .unchecked
+		case 2:  self = .filtered
 		default: self = .all
 		}
 	}
@@ -46,6 +48,17 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	var filePath: String = ""
 	var visibilityState: VisibilityState = .all
+	
+	let searchController = UISearchController(searchResultsController: nil)
+    var searchTerm: String = ""
+    
+	var isSearchBarEmpty: Bool {
+	  return searchController.searchBar.text?.isEmpty ?? true
+	}
+	
+	var isFiltering: Bool {
+	  return searchController.isActive && !isSearchBarEmpty
+	}
 	
 	// MARK: - View Life Cycle
 	
@@ -78,9 +91,33 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		self.navigationItem.rightBarButtonItems = [self.editButtonItem, actionButtonItem]
 		
+		// Set up the table view
 		self.tableView.rowHeight = UITableView.automaticDimension
 		self.tableView.estimatedRowHeight = 44
 		self.tableView.tableFooterView = UIView()
+		
+		// Configure the search controller
+		self.searchController.searchResultsUpdater = self
+		self.searchController.dimsBackgroundDuringPresentation = false
+		self.searchController.searchBar.placeholder = "Search".localize()
+		self.definesPresentationContext = true
+		self.tableView.tableHeaderView = searchController.searchBar
+		
+		// This is 44.0 on iOS 10, but 56.0 on iOS 11 and later due to the search bar being larger
+		let searchBarHeight = self.searchController.searchBar.frame.size.height
+		
+		// Hide the search bar upon initial load of this screen
+		if #available(iOS 11.0, *) {
+			// Change the offset w/i the dispatch queue so this gets properly adjusted on iPhone X-style displays
+			// Reference: https://stackoverflow.com/a/40077398
+			DispatchQueue.main.async {
+				let offset = CGPoint.init(x: 0, y: searchBarHeight)
+				self.tableView.setContentOffset(offset, animated: false)
+			}
+		} else {
+			// For iOS 10, because the above version creates and odd offset for the tableview
+			self.tableView.contentOffset = CGPoint(x: 0, y: searchBarHeight)
+		}
 	}
 	
 	// MARK: - IBActions
@@ -143,6 +180,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			popoverPresentationController.barButtonItem = sender
 		}
 		
+		// If displaying the share sheet is slow, use the dispatch queue
 		//DispatchQueue.main.async() {
 			self.present(shareVC, animated: true, completion: nil)
 		//}
@@ -238,7 +276,19 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		
-		if self.visibilityState == .all {
+		if self.isFiltering == true { // Filtered/Search results
+			
+			let row = indexPath.row
+			let item = self.visibleRecords[row]
+			let tempIndex = item.itemIndex
+			item.itemChecked = !item.itemChecked
+			
+			self.records[tempIndex] = item
+			
+			self.saveFile()
+			self.updateVisibleRecords()
+			
+		} else if self.visibilityState == .all {
 			
 			let row = indexPath.row
 			let item = self.records[row]
@@ -280,12 +330,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
             // Delete the row from the data source
 			let row = indexPath.row
 			
-			if self.visibilityState == .all {
-				
-				self.records.remove(at: row)
-				self.updateVisibleRecords()
-				
-			} else if self.visibilityState == .unchecked {
+            // When searching or displaying only the Unchecked items
+            if self.isFiltering == true || self.visibilityState == .unchecked {
 				
 				let selectedObject = self.visibleRecords[row]
 				let originalIndex = selectedObject.itemIndex
@@ -295,9 +341,16 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 				}
 				
 				self.updateVisibleRecords()
-			}
+                
+			} else if self.visibilityState == .all {
+                
+                self.records.remove(at: row)
+                self.updateVisibleRecords()
+                
+            }
 			
-			if self.visibleRecords.count <= 0 {
+            // If there are no visible Unchecked records to display, disable the Edit button
+            if self.visibleRecords.count <= 0 && self.isFiltering == false {
 				self.tableView.setEditing(false, animated: true)
 				self.navigationController?.setEditing(false, animated: true)
 				self.editButtonItem.isEnabled = false
@@ -316,7 +369,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		var row: Int = indexPath.row
 		let listItem = self.visibleRecords[row]
 		
-		if self.visibilityState == .unchecked {
+        // Select the correct item for filtered and unchecked views
+        if self.isFiltering == true || self.visibilityState == .unchecked {
 			// Send the index of the full records, not just the visible records
 			let item = self.visibleRecords[row]
 			let index = item.itemIndex
@@ -373,7 +427,9 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
     // Override to support conditional rearranging of the table view.
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
-		if self.visibilityState == .all {
+		if self.isFiltering == true {
+			return false
+		} else if self.visibilityState == .all {
         	return true
 		} else { // Show only unchecked items
 			return false
@@ -443,7 +499,23 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		self.visibleRecords.removeAll()
 		
-		if self.visibilityState == .unchecked { // Unchecked items
+		if self.isFiltering == true {
+            
+            for (index, item) in self.records.enumerated() {
+
+                let tempItem:ListItem = item
+                let isFilteredItem = item.itemTitle.lowercased().contains(self.searchTerm.lowercased())
+
+                // If the item contains the search term, add it to the visible records
+                if isFilteredItem == true {
+                    tempItem.itemIndex = index // ensure that the item has the original index
+                    self.visibleRecords.append(tempItem)
+                }
+            }
+            
+			self.tableView.reloadData()
+		}
+		else if self.visibilityState == .unchecked { // Unchecked items
 			// I initially tried using a filter function, but it caused a bug
 			// if an item was quickly tapped multiple times, which would
 			// duplicate an item.
@@ -572,6 +644,8 @@ extension ListItemsViewController: EditItemControllerDelegate {
 	
 	func addNewItem(item: ListItem) {
 
+		item.itemIndex = self.records.count // Set an itemIndex for this new list item
+		
 		self.records.append(item)
 		self.updateVisibleRecords()
 		
@@ -590,5 +664,19 @@ extension ListItemsViewController: EditItemControllerDelegate {
 		
 		self.updateVisibleRecords()
 		self.saveFile()
+	}
+}
+
+// MARK: - UISearchResultsUpdating Methods
+
+extension ListItemsViewController: UISearchResultsUpdating {
+	
+	func updateSearchResults(for searchController: UISearchController) {
+		self.filterSearchResults(for: searchController.searchBar.text ?? "")
+	}
+	
+	func filterSearchResults(for searchText: String)  {
+        self.searchTerm = searchText
+		self.updateVisibleRecords()
 	}
 }
