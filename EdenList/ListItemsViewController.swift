@@ -283,6 +283,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			let tempIndex = item.itemIndex
 			item.itemChecked = !item.itemChecked
 			
+			self.hapticTap(highlighted: item.itemChecked)
+			
 			self.records[tempIndex] = item
 			
 			self.saveFile()
@@ -293,6 +295,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			let row = indexPath.row
 			let item = self.records[row]
 			item.itemChecked = !item.itemChecked
+			
+			self.hapticTap(highlighted: item.itemChecked)
 			
 			self.records[row] = item // update the records with the modified ListItem
 			
@@ -305,6 +309,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			let item = self.visibleRecords[row]
 			let tempIndex = item.itemIndex
 			item.itemChecked = !item.itemChecked
+			
+			self.hapticTap(highlighted: item.itemChecked)
 			
 			self.records[tempIndex] = item
 			self.tableView.reloadData() // Immediately update the table to briefly show the checked item
@@ -556,6 +562,21 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	@objc func scrollToBottom() {
 		let scrollIndexPath: IndexPath = IndexPath.init(row: self.visibleRecords.count - 1, section: 0)
 		self.tableView.scrollToRow(at: scrollIndexPath, at: .bottom, animated: true)
+	}
+	
+	
+	/// For iPhone 8 and later, give a small haptic feedback when tapping on a list item
+	/// - Parameter highlighted: Boolean parameter to determine if the item has been selected
+	func hapticTap(highlighted: Bool) {
+		
+		if highlighted == true {
+			let impact = UIImpactFeedbackGenerator(style: .medium)
+			impact.impactOccurred()
+		} else {
+			// Once iOS 13+ is required, change this style to .soft
+			let impact = UIImpactFeedbackGenerator(style: .light)
+			impact.impactOccurred()
+		}
 	}
 	
 	// MARK: - File operation methods
