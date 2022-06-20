@@ -62,6 +62,8 @@ class EditItemViewController: UITableViewController {
 		let cancelButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
 		let saveButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(save))
 		
+		// Good reference for the large titles: https://chariotsolutions.com/blog/post/large-titles-ios-11/
+		self.navigationItem.largeTitleDisplayMode = .never
 		self.navigationItem.leftBarButtonItem = cancelButtonItem
 		self.navigationItem.rightBarButtonItem = saveButtonItem
 		

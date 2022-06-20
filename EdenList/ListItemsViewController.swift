@@ -90,6 +90,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		actionButtonItem.style = UIBarButtonItem.Style.plain
 		
 		self.navigationItem.rightBarButtonItems = [self.editButtonItem, actionButtonItem]
+		self.navigationItem.largeTitleDisplayMode = .never
 		
 		// Set up the table view
 		self.tableView.rowHeight = UITableView.automaticDimension
@@ -98,7 +99,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		// Configure the search controller
 		self.searchController.searchResultsUpdater = self
-		self.searchController.dimsBackgroundDuringPresentation = false
+		self.searchController.obscuresBackgroundDuringPresentation = false
 		self.searchController.searchBar.placeholder = "Search".localize()
 		self.definesPresentationContext = true
 		self.tableView.tableHeaderView = searchController.searchBar
@@ -107,16 +108,12 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		let searchBarHeight = self.searchController.searchBar.frame.size.height
 		
 		// Hide the search bar upon initial load of this screen
-		if #available(iOS 11.0, *) {
-			// Change the offset w/i the dispatch queue so this gets properly adjusted on iPhone X-style displays
-			// Reference: https://stackoverflow.com/a/40077398
-			DispatchQueue.main.async {
-				let offset = CGPoint.init(x: 0, y: searchBarHeight)
-				self.tableView.setContentOffset(offset, animated: false)
-			}
-		} else {
-			// For iOS 10, because the above version creates and odd offset for the tableview
-			self.tableView.contentOffset = CGPoint(x: 0, y: searchBarHeight)
+		// Change the offset w/i the dispatch queue so this gets properly adjusted on iPhone X-style displays
+		// But this might be causing issues for non-notched displays.
+		// Reference: https://stackoverflow.com/a/40077398
+		DispatchQueue.main.async {
+			let offset = CGPoint.init(x: 0, y: searchBarHeight)
+			self.tableView.setContentOffset(offset, animated: false)
 		}
 	}
 	
