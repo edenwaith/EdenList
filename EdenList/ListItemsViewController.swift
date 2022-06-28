@@ -68,8 +68,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		// Reference to reorder rows using a long press
 		// https://www.freshconsulting.com/create-drag-and-drop-uitableview-swift/
 		// https://github.com/Task-Hero/TaskHero-iOS/blob/master/TaskHero/HomeViewController.swift
-		openFile()
-        setupUI()
+		self.openFile()
+		self.setupUI()
     }
 	
 	override func viewDidAppear(_ animated: Bool) {
@@ -104,7 +104,6 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.definesPresentationContext = true
 		self.tableView.tableHeaderView = searchController.searchBar
 		
-		// This is 44.0 on iOS 10, but 56.0 on iOS 11 and later due to the search bar being larger
 		let searchBarHeight = self.searchController.searchBar.frame.size.height
 		
 		// Hide the search bar upon initial load of this screen
