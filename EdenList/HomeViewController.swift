@@ -371,6 +371,7 @@ extension HomeViewController: NameListViewControllerDelegate {
 				self.records.append(name)
 				self.navigationItem.leftBarButtonItem?.isEnabled = true
 				self.updateVisibleRecords()
+				self.reloadData(forceReload: false)
 				
 				// Scroll to the bottom of the list when a new item has been added.
 				let scrollIndexPath = IndexPath(row: self.records.count - 1, section: 0) // [NSIndexPath indexPathForRow:([records count]-1) inSection:0];
@@ -387,6 +388,8 @@ extension HomeViewController: NameListViewControllerDelegate {
 			ListManager.sharedManager.renameList(from: oldFileName, to: name)
 			
 			self.updateVisibleRecords()
+			self.reloadData(forceReload: false)
+			
 			self.saveLists()
 		}
 	}
