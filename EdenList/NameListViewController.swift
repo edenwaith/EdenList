@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol NameListViewControllerDelegate: class {
+protocol NameListViewControllerDelegate: AnyObject {
 	func nameListUpdated(with name: String, with row: Int)
 	func nameListViewCanceled() // Consider if this is necessary or not
 }
