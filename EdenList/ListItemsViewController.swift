@@ -68,8 +68,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		// Reference to reorder rows using a long press
 		// https://www.freshconsulting.com/create-drag-and-drop-uitableview-swift/
 		// https://github.com/Task-Hero/TaskHero-iOS/blob/master/TaskHero/HomeViewController.swift
-		openFile()
-        setupUI()
+		self.openFile()
+		self.setupUI()
     }
 	
 	override func viewDidAppear(_ animated: Bool) {
@@ -90,6 +90,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		actionButtonItem.style = UIBarButtonItem.Style.plain
 		
 		self.navigationItem.rightBarButtonItems = [self.editButtonItem, actionButtonItem]
+		self.navigationItem.largeTitleDisplayMode = .never
 		
 		// Set up the table view
 		self.tableView.rowHeight = UITableView.automaticDimension
@@ -98,25 +99,20 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		// Configure the search controller
 		self.searchController.searchResultsUpdater = self
-		self.searchController.dimsBackgroundDuringPresentation = false
+		self.searchController.obscuresBackgroundDuringPresentation = false
 		self.searchController.searchBar.placeholder = "Search".localize()
 		self.definesPresentationContext = true
 		self.tableView.tableHeaderView = searchController.searchBar
 		
-		// This is 44.0 on iOS 10, but 56.0 on iOS 11 and later due to the search bar being larger
 		let searchBarHeight = self.searchController.searchBar.frame.size.height
 		
 		// Hide the search bar upon initial load of this screen
-		if #available(iOS 11.0, *) {
-			// Change the offset w/i the dispatch queue so this gets properly adjusted on iPhone X-style displays
-			// Reference: https://stackoverflow.com/a/40077398
-			DispatchQueue.main.async {
-				let offset = CGPoint.init(x: 0, y: searchBarHeight)
-				self.tableView.setContentOffset(offset, animated: false)
-			}
-		} else {
-			// For iOS 10, because the above version creates and odd offset for the tableview
-			self.tableView.contentOffset = CGPoint(x: 0, y: searchBarHeight)
+		// Change the offset w/i the dispatch queue so this gets properly adjusted on iPhone X-style displays
+		// But this might be causing issues for non-notched displays.
+		// Reference: https://stackoverflow.com/a/40077398
+		DispatchQueue.main.async {
+			let offset = CGPoint.init(x: 0, y: searchBarHeight)
+			self.tableView.setContentOffset(offset, animated: false)
 		}
 	}
 	
@@ -283,6 +279,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			let tempIndex = item.itemIndex
 			item.itemChecked = !item.itemChecked
 			
+			self.hapticTap(highlighted: item.itemChecked)
+			
 			self.records[tempIndex] = item
 			
 			self.saveFile()
@@ -293,6 +291,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			let row = indexPath.row
 			let item = self.records[row]
 			item.itemChecked = !item.itemChecked
+			
+			self.hapticTap(highlighted: item.itemChecked)
 			
 			self.records[row] = item // update the records with the modified ListItem
 			
@@ -305,6 +305,8 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			let item = self.visibleRecords[row]
 			let tempIndex = item.itemIndex
 			item.itemChecked = !item.itemChecked
+			
+			self.hapticTap(highlighted: item.itemChecked)
 			
 			self.records[tempIndex] = item
 			self.tableView.reloadData() // Immediately update the table to briefly show the checked item
@@ -556,6 +558,21 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	@objc func scrollToBottom() {
 		let scrollIndexPath: IndexPath = IndexPath.init(row: self.visibleRecords.count - 1, section: 0)
 		self.tableView.scrollToRow(at: scrollIndexPath, at: .bottom, animated: true)
+	}
+	
+	
+	/// For iPhone 8 and later, give a small haptic feedback when tapping on a list item
+	/// - Parameter highlighted: Boolean parameter to determine if the item has been selected
+	func hapticTap(highlighted: Bool) {
+		
+		if highlighted == true {
+			let impact = UIImpactFeedbackGenerator(style: .medium)
+			impact.impactOccurred()
+		} else {
+			// Once iOS 13+ is required, change this style to .soft
+			let impact = UIImpactFeedbackGenerator(style: .light)
+			impact.impactOccurred()
+		}
 	}
 	
 	// MARK: - File operation methods

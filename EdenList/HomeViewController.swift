@@ -11,7 +11,20 @@ import UIKit
 class HomeViewController: UITableViewController {
 
 	var records = [String]()
+	var visibleRecords = [String]()
+	
 	let listManager = ListManager.sharedManager
+	
+	let searchController = UISearchController(searchResultsController: nil)
+	var searchTerm: String = ""
+	
+	var isSearchBarEmpty: Bool {
+	  return searchController.searchBar.text?.isEmpty ?? true
+	}
+	
+	var isFiltering: Bool {
+	  return searchController.isActive && !isSearchBarEmpty
+	}
 	
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,6 +76,24 @@ class HomeViewController: UITableViewController {
 		self.tableView.rowHeight = UITableView.automaticDimension
 		self.tableView.estimatedRowHeight = 44
 		self.tableView.tableFooterView = UIView()
+		
+		// Configure the search controller
+		self.searchController.searchResultsUpdater = self
+		self.searchController.obscuresBackgroundDuringPresentation = false
+		self.searchController.searchBar.placeholder = "Search".localize()
+		self.definesPresentationContext = true
+		self.tableView.tableHeaderView = searchController.searchBar
+		
+		let searchBarHeight = self.searchController.searchBar.frame.size.height
+		
+		// Hide the search bar upon initial load of this screen
+		// Change the offset w/i the dispatch queue so this gets properly adjusted on iPhone X-style displays
+		// But this might be causing issues for non-notched displays.
+		// Reference: https://stackoverflow.com/a/40077398
+		DispatchQueue.main.async {
+			let offset = CGPoint.init(x: 0, y: searchBarHeight)
+			self.tableView.setContentOffset(offset, animated: false)
+		}
 	}
 	
 	// MARK: - List Methods
@@ -80,7 +111,7 @@ class HomeViewController: UITableViewController {
 			self.records = []
 		}
 		
-		self.reloadData()
+		self.updateVisibleRecords()
 	}
 	
 	
@@ -90,6 +121,31 @@ class HomeViewController: UITableViewController {
 		self.tableView.reloadData()
 		self.scrollToBottom()
 		self.checkForRecentList()
+	}
+	
+	@objc func updateVisibleRecords() {
+		
+		self.visibleRecords.removeAll()
+		
+		if self.isFiltering == true {
+			
+			for item in self.records {
+
+				let tempItem:String = item
+				let isFilteredItem = item.lowercased().contains(self.searchTerm.lowercased())
+
+				// If the item contains the search term, add it to the visible records
+				if isFilteredItem == true {
+					// tempItem.itemIndex = index // ensure that the item has the original index
+					self.visibleRecords.append(tempItem)
+				}
+			}
+			
+			self.tableView.reloadData()
+		} else {
+			self.visibleRecords = self.records
+			self.tableView.reloadData()
+		}
 	}
 	
 	/// Upon a fresh start, check to see if another list was being viewed.
@@ -175,7 +231,7 @@ class HomeViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.records.count
+        return self.visibleRecords.count
     }
 
 	
@@ -183,7 +239,7 @@ class HomeViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
 
         // Configure the cell...
-		cell.textLabel?.text = self.records[indexPath.row]
+		cell.textLabel?.text = self.visibleRecords[indexPath.row]
 		cell.textLabel?.adjustsFontForContentSizeCategory = true
 		cell.accessibilityHint = "Tappable".localize()
 
@@ -194,12 +250,12 @@ class HomeViewController: UITableViewController {
 	
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		
-		if self.tableView.isEditing == true {
+		if self.isFiltering == false && self.tableView.isEditing == true {
 			
 			let storyboard = UIStoryboard(name: "Main", bundle: nil)
 			
 			if let nameListController = storyboard.instantiateViewController(withIdentifier: "nameListViewControllerID") as? NameListViewController {
-				let itemName = self.records[indexPath.row]
+				let itemName = self.visibleRecords[indexPath.row]
 				nameListController.isNewList = false
 				nameListController.delegate = self
 				nameListController.listName = itemName
@@ -218,6 +274,16 @@ class HomeViewController: UITableViewController {
 	
 	// MARK: - Edit Rows
 	
+	// Override to support conditional editing of the table view.
+	override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+		// Return false if you do not want the specified item to be editable.
+		if isFiltering == true {
+			return false
+		} else {
+			return true
+		}
+	}
+	
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		
@@ -227,8 +293,8 @@ class HomeViewController: UITableViewController {
 			let listName = self.records[indexPath.row]
 			
 			self.records.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-			reloadData(forceReload: false)
+			self.updateVisibleRecords()
+			self.reloadData(forceReload: false)
 
 			self.saveLists()
 			ListManager.sharedManager.deleteList(listName: listName)
@@ -243,7 +309,8 @@ class HomeViewController: UITableViewController {
 		let record = self.records[fromRow]
 		self.records.remove(at: fromRow)
 		self.records.insert(record, at: toRow)
-		reloadData(forceReload: false)
+		self.updateVisibleRecords()
+		self.reloadData(forceReload: false)
 		
 		self.saveLists()
     }
@@ -256,7 +323,7 @@ class HomeViewController: UITableViewController {
 		
 		if let listItemController = storyboard.instantiateViewController(withIdentifier: "listItemsViewControllerID") as? ListItemsViewController {
 		
-			let listName = self.records[indexPath.row]
+			let listName = self.visibleRecords[indexPath.row]
 			listItemController.title = listName
 			self.listManager.saveRecentList(listName)
 			
@@ -266,7 +333,7 @@ class HomeViewController: UITableViewController {
 	
 	/// After adding a new item to the list, scroll to the bottom of the table view so the new item is visible
 	func scrollToBottom() {
-		let scrollIndexPath: IndexPath = IndexPath.init(row: self.records.count - 1, section: 0)
+		let scrollIndexPath: IndexPath = IndexPath.init(row: self.visibleRecords.count - 1, section: 0)
 		self.tableView.scrollToRow(at: scrollIndexPath, at: .bottom, animated: true)
 	}
 }
@@ -303,7 +370,8 @@ extension HomeViewController: NameListViewControllerDelegate {
 			if nameAlreadyExists == false {
 				self.records.append(name)
 				self.navigationItem.leftBarButtonItem?.isEnabled = true
-				self.reloadData()
+				self.updateVisibleRecords()
+				self.reloadData(forceReload: false)
 				
 				// Scroll to the bottom of the list when a new item has been added.
 				let scrollIndexPath = IndexPath(row: self.records.count - 1, section: 0) // [NSIndexPath indexPathForRow:([records count]-1) inSection:0];
@@ -319,11 +387,27 @@ extension HomeViewController: NameListViewControllerDelegate {
 			
 			ListManager.sharedManager.renameList(from: oldFileName, to: name)
 			
-			self.reloadData()
+			self.updateVisibleRecords()
+			self.reloadData(forceReload: false)
+			
 			self.saveLists()
 		}
 	}
 	
 	func nameListViewCanceled() {
+	}
+}
+
+// MARK: - UISearchResultsUpdating Methods
+
+extension HomeViewController: UISearchResultsUpdating {
+	
+	func updateSearchResults(for searchController: UISearchController) {
+		self.filterSearchResults(for: searchController.searchBar.text ?? "")
+	}
+	
+	func filterSearchResults(for searchText: String)  {
+		self.searchTerm = searchText
+		self.updateVisibleRecords()
 	}
 }
