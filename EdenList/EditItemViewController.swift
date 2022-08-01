@@ -17,7 +17,7 @@ enum EditItemRow: Int {
 
 // MARK: - EditItemControllerDelegate Protocol
 
-protocol EditItemControllerDelegate: class  {
+protocol EditItemControllerDelegate: AnyObject  {
 	func addNewItem(item: ListItem)
 	func editItem(item: ListItem, at index: Int)
 }

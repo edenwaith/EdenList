@@ -101,6 +101,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.searchController.searchResultsUpdater = self
 		self.searchController.obscuresBackgroundDuringPresentation = false
 		self.searchController.searchBar.placeholder = "Search".localize()
+		self.searchController.searchBar.searchBarStyle = .minimal
 		self.definesPresentationContext = true
 		self.tableView.tableHeaderView = searchController.searchBar
 		
