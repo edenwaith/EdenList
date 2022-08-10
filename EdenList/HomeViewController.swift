@@ -81,8 +81,10 @@ class HomeViewController: UITableViewController {
 		self.searchController.searchResultsUpdater = self
 		self.searchController.obscuresBackgroundDuringPresentation = false
 		self.searchController.searchBar.placeholder = "Search".localize()
+		self.searchController.searchBar.searchBarStyle = .minimal
 		self.definesPresentationContext = true
-		self.tableView.tableHeaderView = searchController.searchBar
+
+		self.tableView.tableHeaderView = self.searchController.searchBar
 		
 		let searchBarHeight = self.searchController.searchBar.frame.size.height
 		

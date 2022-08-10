@@ -102,6 +102,11 @@ extension NameListViewController: UITextFieldDelegate {
 			self.navigationItem.rightBarButtonItem?.isEnabled = false
 		}
 		
+		// Do not allow the slash to be in file names because items will not save properly
+		if string == "/" {
+			return false
+		}
+		
 		return true
 		
 	}
