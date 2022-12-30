@@ -66,6 +66,7 @@ class EditItemViewController: UITableViewController {
 		self.navigationItem.largeTitleDisplayMode = .never
 		self.navigationItem.leftBarButtonItem = cancelButtonItem
 		self.navigationItem.rightBarButtonItem = saveButtonItem
+		self.navigationController?.navigationBar.isTranslucent = false
 		
 		// Set up view controller title
 		if isNewItem == true {

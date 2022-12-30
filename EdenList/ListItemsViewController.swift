@@ -42,6 +42,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 
 	@IBOutlet weak var tableView: UITableView!
 	@IBOutlet weak var organizationControl: UISegmentedControl!
+	@IBOutlet weak var bottomToolbar: UIToolbar!
 	
 	var records = [ListItem]()
 	var visibleRecords = [ListItem]()
@@ -91,6 +92,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		
 		self.navigationItem.rightBarButtonItems = [self.editButtonItem, actionButtonItem]
 		self.navigationItem.largeTitleDisplayMode = .never
+		self.navigationController?.navigationBar.isTranslucent = false
 		
 		// Set up the table view
 		self.tableView.rowHeight = UITableView.automaticDimension
@@ -102,19 +104,12 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.searchController.obscuresBackgroundDuringPresentation = false
 		self.searchController.searchBar.placeholder = "Search".localize()
 		self.searchController.searchBar.searchBarStyle = .minimal
+		
+		self.searchController.searchBar.backgroundColor = UIColor.customBackgroundColor
+		self.bottomToolbar.backgroundColor = UIColor.customBackgroundColor
+		
+		self.navigationItem.searchController = self.searchController
 		self.definesPresentationContext = true
-		self.tableView.tableHeaderView = searchController.searchBar
-		
-		let searchBarHeight = self.searchController.searchBar.frame.size.height
-		
-		// Hide the search bar upon initial load of this screen
-		// Change the offset w/i the dispatch queue so this gets properly adjusted on iPhone X-style displays
-		// But this might be causing issues for non-notched displays.
-		// Reference: https://stackoverflow.com/a/40077398
-		DispatchQueue.main.async {
-			let offset = CGPoint.init(x: 0, y: searchBarHeight)
-			self.tableView.setContentOffset(offset, animated: false)
-		}
 	}
 	
 	// MARK: - IBActions
@@ -591,6 +586,9 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			self.organizationControl.selectedSegmentIndex = self.visibilityState.rawValue
 			
 			self.updateVisibleRecords()
+		} else {
+			// If this is a brand new list, create a stub file
+			self.saveFile()
 		}
 	}
 	
