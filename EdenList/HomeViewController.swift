@@ -26,6 +26,8 @@ class HomeViewController: UITableViewController {
 	  return searchController.isActive && !isSearchBarEmpty
 	}
 	
+	// MARK: - Life cycle methods
+	
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -55,7 +57,6 @@ class HomeViewController: UITableViewController {
 	
 	// MARK: -
 	
-	
 	/// Save the current lists if the app is being terminated (force quit)
 	/// Note: I doubt this is actually ever being called.  Might want to remove if
 	/// this doesn't seem to ever get called.
@@ -71,6 +72,16 @@ class HomeViewController: UITableViewController {
 		self.navigationItem.leftBarButtonItem = self.editButtonItem
 		self.navigationItem.rightBarButtonItem = addButton
 		self.navigationItem.title = "EdenList".localize()
+		self.navigationController?.navigationBar.isTranslucent = false
+		
+		// This is being used to avoid a weird shading during a transition in the navigation bar
+		if #available(iOS 13.0, *) {
+			let appearance = UINavigationBarAppearance()
+			appearance.configureWithOpaqueBackground()
+			appearance.backgroundColor = UIColor.customBackgroundColor
+			self.navigationController?.navigationBar.standardAppearance = appearance
+			self.navigationController?.navigationBar.scrollEdgeAppearance = self.navigationController?.navigationBar.standardAppearance
+		}
 		
 		// Don't display empty "cells"
 		self.tableView.rowHeight = UITableView.automaticDimension
@@ -82,20 +93,12 @@ class HomeViewController: UITableViewController {
 		self.searchController.obscuresBackgroundDuringPresentation = false
 		self.searchController.searchBar.placeholder = "Search".localize()
 		self.searchController.searchBar.searchBarStyle = .minimal
+		self.searchController.searchBar.sizeToFit()
+		self.searchController.searchBar.backgroundColor = UIColor.customBackgroundColor
+		
+		// Alternatives for placing the search controller: https://stackoverflow.com/questions/58727139/show-search-bar-in-navigation-bar-and-large-title-also-without-scrolling-on-ios
+		self.navigationItem.searchController = self.searchController
 		self.definesPresentationContext = true
-
-		self.tableView.tableHeaderView = self.searchController.searchBar
-		
-		let searchBarHeight = self.searchController.searchBar.frame.size.height
-		
-		// Hide the search bar upon initial load of this screen
-		// Change the offset w/i the dispatch queue so this gets properly adjusted on iPhone X-style displays
-		// But this might be causing issues for non-notched displays.
-		// Reference: https://stackoverflow.com/a/40077398
-		DispatchQueue.main.async {
-			let offset = CGPoint.init(x: 0, y: searchBarHeight)
-			self.tableView.setContentOffset(offset, animated: false)
-		}
 	}
 	
 	// MARK: - List Methods
@@ -160,7 +163,12 @@ class HomeViewController: UITableViewController {
 			if ListManager.sharedManager.fileExists(fileName: mostRecentList) == true {
 				if let index = self.records.firstIndex(of: mostRecentList) {
 					let indexPath = IndexPath(row: index, section: 0)
-					self.displayListAtIndex(indexPath: indexPath)
+					
+					// Make the call like this to resolve an issue with iOS 12 where the
+					// search bar is not visible
+					DispatchQueue.main.async {
+						self.displayListAtIndex(indexPath: indexPath)
+					}
 				}
 			}
 		} else {
@@ -221,7 +229,6 @@ class HomeViewController: UITableViewController {
 			
 			// Need to add a navigation controller to wrap around this VC, since the view is being presented modally
 			let navigationVC = UINavigationController(rootViewController: nameListController)
-			
 			self.navigationController?.present(navigationVC, animated: true, completion: nil)
 		}
 	}
