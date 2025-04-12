@@ -12,6 +12,7 @@ class HomeViewController: UITableViewController {
 
 	var records = [String]()
 	var visibleRecords = [String]()
+    var pinnedRecords = [String]()
 	
 	let listManager = ListManager.sharedManager
 	
@@ -25,6 +26,10 @@ class HomeViewController: UITableViewController {
 	var isFiltering: Bool {
 	  return searchController.isActive && !isSearchBarEmpty
 	}
+    
+    var hasPinnedRecords: Bool {
+        return pinnedRecords.count > 0
+    }
 	
 	// MARK: - Life cycle methods
 	
@@ -107,14 +112,18 @@ class HomeViewController: UITableViewController {
 	func loadLists() {
 		
 		let listsArray = listManager.lists()
-		
+		let pinnedLists = listManager.pinnedLists()
+        
 		self.records.removeAll()
 		
+        // In theory, shouldn't the lists() method return something valid or an empty array?
 		if listsArray.count > 0 {
 			self.records = listsArray
 		} else {
 			self.records = []
 		}
+        
+        self.pinnedRecords = pinnedLists
 		
 		self.updateVisibleRecords()
 	}
@@ -138,7 +147,7 @@ class HomeViewController: UITableViewController {
 
 				let tempItem:String = item
 				let isFilteredItem = item.lowercased().contains(self.searchTerm.lowercased())
-
+                
 				// If the item contains the search term, add it to the visible records
 				if isFilteredItem == true {
 					// tempItem.itemIndex = index // ensure that the item has the original index
@@ -148,8 +157,22 @@ class HomeViewController: UITableViewController {
 			
 			self.tableView.reloadData()
 		} else {
-			self.visibleRecords = self.records
-			self.tableView.reloadData()
+            
+            if self.hasPinnedRecords == true {
+                self.visibleRecords = self.records
+                
+//                for pinnedRecord in pinnedRecords {
+//                    if let index = self.visibleRecords.firstIndex(of: pinnedRecord) {
+//                        self.visibleRecords.remove(at: index)
+//                    }
+//                }
+                
+                self.tableView.reloadData()
+                
+            } else {
+                self.visibleRecords = self.records
+                self.tableView.reloadData()
+            }
 		}
 	}
 	
@@ -180,7 +203,7 @@ class HomeViewController: UITableViewController {
 	}
 	
 	func saveLists() {
-		listManager.saveLists(lists: self.records)
+        listManager.saveLists(lists: self.records, pinnedLists: self.pinnedRecords)
 	}
 	
 	/// After a change in the table's data, update the appearance.
@@ -236,11 +259,37 @@ class HomeViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        if self.isFiltering == true {
+            return 1
+        } else if self.hasPinnedRecords == true {
+            return 2
+        } else {
+            return 1
+        }
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.visibleRecords.count
+        if self.isFiltering == true {
+            return self.visibleRecords.count
+        } else if pinnedRecords.count > 0 && section == 0 {
+            return pinnedRecords.count
+        } else {
+            return self.visibleRecords.count
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if self.isFiltering == true {
+            return nil
+        } else if self.hasPinnedRecords {
+            if section == 0 {
+                return "Pinned".localize()
+            } else {
+                return self.visibleRecords.count > 0 ? "All Lists".localize() : ""
+            }
+        } else {
+            return nil
+        }
     }
 
 	
@@ -248,7 +297,13 @@ class HomeViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
 
         // Configure the cell...
-		cell.textLabel?.text = self.visibleRecords[indexPath.row]
+        if self.isFiltering == true {
+            cell.textLabel?.text = self.visibleRecords[indexPath.row]
+        } else if self.hasPinnedRecords == true && indexPath.section == 0 {
+            cell.textLabel?.text = self.pinnedRecords[indexPath.row]
+        } else {
+            cell.textLabel?.text = self.visibleRecords[indexPath.row]
+        }
 		cell.textLabel?.adjustsFontForContentSizeCategory = true
 		cell.accessibilityHint = "Tappable".localize()
 
@@ -264,6 +319,7 @@ class HomeViewController: UITableViewController {
 			let storyboard = UIStoryboard(name: "Main", bundle: nil)
 			
 			if let nameListController = storyboard.instantiateViewController(withIdentifier: "nameListViewControllerID") as? NameListViewController {
+                
 				let itemName = self.visibleRecords[indexPath.row]
 				nameListController.isNewList = false
 				nameListController.delegate = self
@@ -309,17 +365,102 @@ class HomeViewController: UITableViewController {
 			ListManager.sharedManager.deleteList(listName: listName)
         }
     }
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let shareAction = UIContextualAction(style: .normal, title: "Share".localize()) { (action, view, actionPerformed) in
+            print("Share me!")
+            // TODO: Need to fix this so it works properly for pinned items, as well
+            
+            let paths: [String] = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+            let documentsDirectory:String = (paths.first)!
+            var selectedFileName = ""
+            
+            if self.hasPinnedRecords == true && indexPath.section == 0{
+                selectedFileName = self.pinnedRecords[indexPath.row]
+            } else {
+                selectedFileName = self.visibleRecords[indexPath.row]
+            }
+            
+            let fileName = selectedFileName + ".edenlist"
+            let writePath = NSURL(fileURLWithPath: documentsDirectory).appendingPathComponent(fileName)
+            let selectedFilePath = (writePath?.path)!
+            
+            Utilities.shareList(fileName: selectedFileName, filePath: selectedFilePath, parentViewController: self)
+            
+            actionPerformed(true)
+        }
+        shareAction.image = UIImage(systemName: "square.and.arrow.up")
+        shareAction.backgroundColor = .systemBlue
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete".localize()) { (action, view, actionPerformed) in
+            print("Delete me!")
+            actionPerformed(true)
+        }
+        deleteAction.image = UIImage(systemName: "trash.fill")
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction, shareAction])
+    }
+    
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        var isRowPinned = false
+        
+        if hasPinnedRecords == true {
+            if indexPath.section == 0 {
+                isRowPinned = true
+            } else {
+                let listName = self.visibleRecords[indexPath.row]
+                isRowPinned = self.pinnedRecords.contains(listName)
+            }
+        }
+        
+        let pinAction = UIContextualAction(style: .normal, title: isRowPinned ? "Unpin".localize() : "Pin".localize()) { (action, view, actionPerformed) in
+            if isRowPinned == false {
+                let listName = self.visibleRecords[indexPath.row]
+                self.pinnedRecords.append(listName)
+                // self.reloadData(forceReload: true)
+                self.updateVisibleRecords()
+            } else {
+                // TODO: Need to fix how to remove from pinned group if they unpinned from the All Lists section
+                self.pinnedRecords.remove(at: indexPath.row)
+                // self.reloadData(forceReload: true)
+                self.updateVisibleRecords()
+            }
+            
+            self.saveLists()
+            actionPerformed(true)
+            print("Pin me!")
+            
+        }
+        pinAction.image = UIImage(systemName: isRowPinned ? "pin.slash.fill" : "pin.fill") // pin.slash.fill
+        pinAction.backgroundColor = .systemOrange
+        
+        return UISwipeActionsConfiguration(actions: [pinAction])
+    }
 
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-		let fromRow = fromIndexPath.row
-		let toRow = to.row
-		
-		let record = self.records[fromRow]
-		self.records.remove(at: fromRow)
-		self.records.insert(record, at: toRow)
-		self.updateVisibleRecords()
-		self.reloadData(forceReload: false)
+        
+        if hasPinnedRecords == true && to.section == 0 {
+            let fromRow = fromIndexPath.row
+            let toRow = to.row
+            
+            let record = self.pinnedRecords[fromRow]
+            self.pinnedRecords.remove(at: fromRow)
+            self.pinnedRecords.insert(record, at: toRow)
+            self.updateVisibleRecords()
+            self.reloadData(forceReload: false)
+        } else {
+            let fromRow = fromIndexPath.row
+            let toRow = to.row
+            
+            let record = self.records[fromRow]
+            self.records.remove(at: fromRow)
+            self.records.insert(record, at: toRow)
+            self.updateVisibleRecords()
+            self.reloadData(forceReload: false)
+        }
 		
 		self.saveLists()
     }
@@ -329,10 +470,20 @@ class HomeViewController: UITableViewController {
 	func displayListAtIndex(indexPath: IndexPath) {
 		
 		let storyboard = UIStoryboard(name: "Main", bundle: nil)
-		
+		// FIXME: Might need to be improved for pinned records
 		if let listItemController = storyboard.instantiateViewController(withIdentifier: "listItemsViewControllerID") as? ListItemsViewController {
-		
-			let listName = self.visibleRecords[indexPath.row]
+            
+            var listName: String = ""
+            
+            if self.isFiltering == true {
+                listName = self.visibleRecords[indexPath.row]
+            } else if self.hasPinnedRecords == true && indexPath.section == 0 {
+                listName = self.pinnedRecords[indexPath.row]
+            } else {
+                listName = self.visibleRecords[indexPath.row]
+            }
+            print("listName:: \(listName)")
+            
 			listItemController.title = listName
 			self.listManager.saveRecentList(listName)
 			
@@ -342,7 +493,8 @@ class HomeViewController: UITableViewController {
 	
 	/// After adding a new item to the list, scroll to the bottom of the table view so the new item is visible
 	func scrollToBottom() {
-		let scrollIndexPath: IndexPath = IndexPath.init(row: self.visibleRecords.count - 1, section: 0)
+        let sectionNum = self.hasPinnedRecords ? 1 : 0
+		let scrollIndexPath: IndexPath = IndexPath.init(row: self.visibleRecords.count - 1, section: sectionNum)
 		self.tableView.scrollToRow(at: scrollIndexPath, at: .bottom, animated: true)
 	}
 }
@@ -383,8 +535,9 @@ extension HomeViewController: NameListViewControllerDelegate {
 				self.reloadData(forceReload: false)
 				
 				// Scroll to the bottom of the list when a new item has been added.
-				let scrollIndexPath = IndexPath(row: self.records.count - 1, section: 0) // [NSIndexPath indexPathForRow:([records count]-1) inSection:0];
-				self.tableView.scrollToRow(at: scrollIndexPath, at: .top, animated: true)
+                self.scrollToBottom()
+//				let scrollIndexPath = IndexPath(row: self.records.count - 1, section: 0) // [NSIndexPath indexPathForRow:([records count]-1) inSection:0];
+//				self.tableView.scrollToRow(at: scrollIndexPath, at: .top, animated: true)
 				
 				self.saveLists()
 			}

@@ -72,6 +72,12 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.openFile()
 		self.setupUI()
     }
+    
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        self.reloadData()
+//        print("\(#function)")
+//    }
 	
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
@@ -104,79 +110,22 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.searchController.obscuresBackgroundDuringPresentation = false
 		self.searchController.searchBar.placeholder = "Search".localize()
 		self.searchController.searchBar.searchBarStyle = .minimal
-		
+        self.searchController.searchBar.sizeToFit()
 		self.searchController.searchBar.backgroundColor = UIColor.customBackgroundColor
+        
 		self.bottomToolbar.backgroundColor = UIColor.customBackgroundColor
 		
 		self.navigationItem.searchController = self.searchController
+
+        // Specify that this view controller determines how the search controller is presented.
+        // The search controller should be presented modally and match the physical size of this view controller.
 		self.definesPresentationContext = true
 	}
 	
 	// MARK: - IBActions
 	
 	@objc func shareButtonTapped(_ sender: UIBarButtonItem) {
-		
-		let fileTitle = self.title ?? ""
-		let fileURL = NSURL(fileURLWithPath: self.filePath)
-		
-		var htmlContent = ""
-		
-		// Retrieve the print_template.html file and put into a string
-		let templatePath = Bundle.main.path(forResource: "print_template", ofType: "html")
-		
-		do {
-			htmlContent = try String(contentsOfFile:templatePath!, encoding: String.Encoding.utf8)
-			// Swap out the title with the name of the file to print
-			htmlContent = htmlContent.replacingOccurrences(of: "__LIST_TITLE__", with: fileTitle)
-			
-			var itemsHTML = ""
-			
-			// Loop through the records and construct an HTML table for printing
-			for item in self.records {
-				let checkedOption: String = item.itemChecked ? "checked " : ""
-				let itemTemplate = """
-					<tr>
-						<td><input type="checkbox" \(checkedOption)/></td>
-						<td>
-							<h4>\(item.itemTitle)</h4>
-							<h5>\(item.itemNotes)</h4>
-						</td>
-					</tr>
-				"""
-				
-				itemsHTML += itemTemplate
-			}
-			
-			htmlContent = htmlContent.replacingOccurrences(of: "__LIST_ITEMS__", with: itemsHTML)
-			
-		} catch _ as NSError {
-			
-		}
-		
-		let printInfo = UIPrintInfo(dictionary:nil)
-		printInfo.outputType = UIPrintInfo.OutputType.general
-		printInfo.jobName = fileTitle
-		printInfo.orientation = .portrait
-		printInfo.duplex = .longEdge
-				
-		let formatter = UIMarkupTextPrintFormatter(markupText: htmlContent)
-		formatter.perPageContentInsets = UIEdgeInsets(top: 36, left: 36, bottom: 36, right: 36)
-		
-		let excludedTypes:[UIActivity.ActivityType] = [.postToFacebook, .postToTwitter, .postToVimeo, .postToWeibo, .postToFlickr, .addToReadingList, .assignToContact, .saveToCameraRoll]
-		let shareVC = UIActivityViewController(activityItems: [fileTitle, fileURL, printInfo, formatter], applicationActivities: nil)
-
-		shareVC.excludedActivityTypes = excludedTypes
-		shareVC.setValue(fileTitle, forKey: "subject")
-		
-		if let popoverPresentationController = shareVC.popoverPresentationController {
-			popoverPresentationController.barButtonItem = sender
-		}
-		
-		// If displaying the share sheet is slow, use the dispatch queue
-		//DispatchQueue.main.async() {
-			self.present(shareVC, animated: true, completion: nil)
-		//}
-		
+        Utilities.shareList(fileName: self.title ?? "", filePath: self.filePath, parentViewController: self)
 	}
 	
 	@IBAction func addItem(_ sender: AnyObject) {
@@ -275,6 +224,10 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			let tempIndex = item.itemIndex
 			item.itemChecked = !item.itemChecked
 			
+            // Potential methods to transition the image when tapped:
+            // https://stackoverflow.com/questions/1996809/animate-uitableviewcells-imageview-insertion
+            // https://stackoverflow.com/questions/17924381/ios-sdwebimage-cross-fade-effect-uitableviewcell7uy8
+            
 			self.hapticTap(highlighted: item.itemChecked)
 			
 			self.records[tempIndex] = item
@@ -582,7 +535,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.filePath = (writePath?.path)!
 		
 		if FileManager.default.fileExists(atPath: self.filePath) {
-			self.records = self.openFile(filePath: self.filePath)
+			self.records = Utilities.openFile(filePath: self.filePath)
 			self.organizationControl.selectedSegmentIndex = self.visibilityState.rawValue
 			
 			self.updateVisibleRecords()
@@ -592,32 +545,32 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		}
 	}
 	
-	func openFile(filePath: String) -> [ListItem] {
-		
-		var tempRecords = [ListItem]()
-		
-		if FileManager.default.fileExists(atPath: filePath) {
-			if let fileContents = NSDictionary(contentsOfFile: filePath) {
-				
-				// File records
-				if let fileRecords = fileContents[Constants.File.Records] as? [[String: Any]] {
-					for record in fileRecords {
-						let newRecord = ListItem(data: record)
-						tempRecords.append(newRecord)
-					}
-				}
-				
-				// Visibility state
-				if let visibility = fileContents[Constants.File.Visibility] as? Int {
-					if let tempVisibility = VisibilityState(rawValue: visibility) {
-						self.visibilityState = tempVisibility
-					}
-				}
-			}
-		}
-		
-		return tempRecords
-	}
+//	func openFile(filePath: String) -> [ListItem] {
+//		
+//		var tempRecords = [ListItem]()
+//		
+//		if FileManager.default.fileExists(atPath: filePath) {
+//			if let fileContents = NSDictionary(contentsOfFile: filePath) {
+//				
+//				// File records
+//				if let fileRecords = fileContents[Constants.File.Records] as? [[String: Any]] {
+//					for record in fileRecords {
+//						let newRecord = ListItem(data: record)
+//						tempRecords.append(newRecord)
+//					}
+//				}
+//				
+//				// Visibility state
+//				if let visibility = fileContents[Constants.File.Visibility] as? Int {
+//					if let tempVisibility = VisibilityState(rawValue: visibility) {
+//						self.visibilityState = tempVisibility
+//					}
+//				}
+//			}
+//		}
+//		
+//		return tempRecords
+//	}
 	
 	func saveFile() {
 		
