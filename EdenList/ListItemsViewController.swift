@@ -535,7 +535,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.filePath = (writePath?.path)!
 		
 		if FileManager.default.fileExists(atPath: self.filePath) {
-			self.records = Utilities.openFile(filePath: self.filePath)
+            (self.records, self.visibilityState) = Utilities.openFile(filePath: self.filePath)
 			self.organizationControl.selectedSegmentIndex = self.visibilityState.rawValue
 			
 			self.updateVisibleRecords()

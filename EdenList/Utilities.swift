@@ -21,7 +21,7 @@ class Utilities {
         // Retrieve the print_template.html file and put into a string
         let templatePath = Bundle.main.path(forResource: "print_template", ofType: "html")
         
-        records = Utilities.openFile(filePath: filePath)
+        (records, _) = Utilities.openFile(filePath: filePath)
         
         do {
             htmlContent = try String(contentsOfFile:templatePath!, encoding: String.Encoding.utf8)
@@ -81,9 +81,10 @@ class Utilities {
         
     }
     
-    static func openFile(filePath: String) -> [ListItem] {
+    static func openFile(filePath: String) -> ([ListItem], VisibilityState) {
         
         var tempRecords = [ListItem]()
+        var visibilityState: VisibilityState = .all
         
         if FileManager.default.fileExists(atPath: filePath) {
             if let fileContents = NSDictionary(contentsOfFile: filePath) {
@@ -98,14 +99,15 @@ class Utilities {
                 
                 // FIXME: need to have some other form of modification
                 // Visibility state
-//                if let visibility = fileContents[Constants.File.Visibility] as? Int {
-//                    if let tempVisibility = VisibilityState(rawValue: visibility) {
-//                        self.visibilityState = tempVisibility
-//                    }
-//                }
+                
+                if let visibility = fileContents[Constants.File.Visibility] as? Int {
+                    if let tempVisibility = VisibilityState(rawValue: visibility) {
+                        visibilityState = tempVisibility
+                    }
+                }
             }
         }
         
-        return tempRecords
+        return (tempRecords, visibilityState)
     }
 }
