@@ -379,26 +379,29 @@ class HomeViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         var isRowPinned = false
+        var listName = ""
         
         if hasPinnedRecords == true {
             if indexPath.section == 0 {
                 isRowPinned = true
+                listName = self.pinnedRecords[indexPath.row]
             } else {
-                let listName = self.visibleRecords[indexPath.row]
+                listName = self.visibleRecords[indexPath.row]
                 isRowPinned = self.pinnedRecords.contains(listName)
             }
+        } else {
+            listName = self.visibleRecords[indexPath.row]
         }
         
         let pinAction = UIContextualAction(style: .normal, title: isRowPinned ? "Unpin".localize() : "Pin".localize()) { (action, view, actionPerformed) in
             if isRowPinned == false {
-                let listName = self.visibleRecords[indexPath.row]
                 self.pinnedRecords.append(listName)
-                // self.reloadData(forceReload: true)
                 self.updateVisibleRecords()
             } else {
-                // FIXME: Need to fix how to remove from pinned group if they unpinned from the All Lists section
-                self.pinnedRecords.remove(at: indexPath.row)
-                // self.reloadData(forceReload: true)
+                // Remove the pinned status
+                let pinnedIndex = self.pinnedRecords.firstIndex(of: listName)!
+                self.pinnedRecords.remove(at: pinnedIndex)
+                
                 self.updateVisibleRecords()
             }
             
@@ -415,13 +418,11 @@ class HomeViewController: UITableViewController {
         
         let shareAction = UIContextualAction(style: .normal, title: "Share".localize()) { (action, view, actionPerformed) in
             
-            // FIXME: Need to fix this so it works properly for pinned items, as well
-            
             let paths: [String] = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
             let documentsDirectory:String = (paths.first)!
             var selectedFileName = ""
             
-            if self.hasPinnedRecords == true && indexPath.section == 0{
+            if self.hasPinnedRecords == true && indexPath.section == 0 {
                 selectedFileName = self.pinnedRecords[indexPath.row]
             } else {
                 selectedFileName = self.visibleRecords[indexPath.row]
@@ -509,28 +510,24 @@ class HomeViewController: UITableViewController {
         
         if self.hasPinnedRecords == true && indexPath.section == 0 {
             listName = self.pinnedRecords[indexPath.row]
-            // Need to also delete the item from self.records
+            self.pinnedRecords.remove(at: indexPath.row)
+            let recordsIndex = self.records.firstIndex(of: listName)!
+            self.records.remove(at: recordsIndex)
         } else {
             listName = self.visibleRecords[indexPath.row]
             
-            // Check if this itemName is also in pinnedRecords
+            // Check if this list is also in pinnedRecords
+            if self.pinnedRecords.contains(listName) == true {
+                let pinnedIndex = self.pinnedRecords.firstIndex(where: { $0 == listName })!
+                self.pinnedRecords.remove(at: pinnedIndex)
+            }
             
-//            let listName = self.records[indexPath.row]
-//            
-//            self.records.remove(at: indexPath.row)
-//            self.updateVisibleRecords()
-//            self.reloadData(forceReload: false)
-//
-//            self.saveLists()
-//            ListManager.sharedManager.deleteList(listName: listName)
-            
+            self.records.remove(at: indexPath.row)
         }
         
-        print("The item to delete is: \(listName)")
-        
-        // Save the lists
-        
-        // Refresh the table
+        self.updateVisibleRecords()
+        self.reloadData(forceReload: false)
+        self.saveLists()
     }
 	
 	/// After adding a new item to the list, scroll to the bottom of the table view so the new item is visible
