@@ -251,6 +251,7 @@
 			buildPhases = (
 				842CF62A1E540E7200BA2CDD /* Sources */,
 				842CF62B1E540E7200BA2CDD /* Frameworks */,
+				848688092DAF5E320052E37E /* Update version string in LaunchScreen Storyboard */,
 				842CF62C1E540E7200BA2CDD /* Resources */,
 			);
 			buildRules = (
@@ -386,6 +387,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		848688092DAF5E320052E37E /* Update version string in LaunchScreen Storyboard */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Update version string in LaunchScreen Storyboard";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Reference: https://thoughtbot.com/blog/making-your-version-number-super-visible\n# Output version & build number to the APP_VERSION label on LaunchScreen.storyboard\nversionNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"${INFOPLIST_FILE}\")\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${INFOPLIST_FILE}\")\n\nsed -i \"\" -e \"/userLabel=\\\"APP_VERSION\\\"/s/text=\\\"[^\\\"]*\\\"/text=\\\" $MARKETING_VERSION\\\"/\" \"$PROJECT_DIR/$PROJECT_NAME/Base.lproj/LaunchScreen.storyboard\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		842CF62A1E540E7200BA2CDD /* Sources */ = {

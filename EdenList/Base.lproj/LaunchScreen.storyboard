@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="ipad9_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -25,29 +23,37 @@
                                     <constraint firstAttribute="width" secondItem="pgn-Dh-nDM" secondAttribute="height" multiplier="1:1" id="uEW-7f-GWA"/>
                                 </constraints>
                             </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" 2.4.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F50-5a-Mhy" userLabel="APP_VERSION">
+                                <rect key="frame" x="366" y="991" width="36" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" systemColor="systemGrayColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="2II-LP-ei4"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="pgn-Dh-nDM" firstAttribute="centerX" secondItem="2II-LP-ei4" secondAttribute="centerX" id="0nb-xI-Ypo"/>
+                            <constraint firstItem="2II-LP-ei4" firstAttribute="bottom" secondItem="F50-5a-Mhy" secondAttribute="bottom" constant="16" id="UMJ-Gg-vir"/>
                             <constraint firstItem="2II-LP-ei4" firstAttribute="bottom" secondItem="pgn-Dh-nDM" secondAttribute="bottom" constant="50" id="Xgp-5e-eob"/>
+                            <constraint firstItem="F50-5a-Mhy" firstAttribute="centerX" secondItem="2II-LP-ei4" secondAttribute="centerX" id="hgC-5s-cXH"/>
                             <constraint firstItem="2II-LP-ei4" firstAttribute="trailing" secondItem="pgn-Dh-nDM" secondAttribute="trailing" constant="200" id="k6m-ry-BjK"/>
                             <constraint firstItem="pgn-Dh-nDM" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="n6o-AG-p4h"/>
                             <constraint firstItem="pgn-Dh-nDM" firstAttribute="leading" secondItem="2II-LP-ei4" secondAttribute="leading" constant="200" id="nX0-vm-RrN"/>
                             <constraint firstItem="pgn-Dh-nDM" firstAttribute="top" secondItem="2II-LP-ei4" secondAttribute="top" constant="50" id="suP-1O-bR6"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="2II-LP-ei4"/>
                         <variation key="default">
                             <mask key="constraints">
-                                <exclude reference="Xgp-5e-eob"/>
                                 <exclude reference="k6m-ry-BjK"/>
+                                <exclude reference="Xgp-5e-eob"/>
                                 <exclude reference="nX0-vm-RrN"/>
                                 <exclude reference="suP-1O-bR6"/>
                             </mask>
                         </variation>
                         <variation key="heightClass=compact">
                             <mask key="constraints">
-                                <include reference="Xgp-5e-eob"/>
                                 <exclude reference="k6m-ry-BjK"/>
+                                <include reference="Xgp-5e-eob"/>
                                 <exclude reference="nX0-vm-RrN"/>
                                 <include reference="suP-1O-bR6"/>
                             </mask>
@@ -67,5 +73,8 @@
     </scenes>
     <resources>
         <image name="edenlist_blue" width="114" height="127"/>
+        <systemColor name="systemGrayColor">
+            <color red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
     </resources>
 </document>
