@@ -91,8 +91,9 @@ class HomeViewController: UITableViewController {
 		// Don't display empty "cells"
 		self.tableView.rowHeight = UITableView.automaticDimension
 		self.tableView.estimatedRowHeight = 44
-		self.tableView.tableFooterView = UIView()
-		
+        self.tableView.contentInsetAdjustmentBehavior = .never // fixes extra space above table when scrolling to top        
+        self.tableView.tableFooterView = UIView()
+        
 		// Configure the search controller
 		self.searchController.searchResultsUpdater = self
 		self.searchController.obscuresBackgroundDuringPresentation = false
