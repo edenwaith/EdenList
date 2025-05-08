@@ -72,12 +72,6 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		self.openFile()
 		self.setupUI()
     }
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        self.reloadData()
-//        print("\(#function)")
-//    }
 	
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
@@ -97,14 +91,19 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 		actionButtonItem.style = UIBarButtonItem.Style.plain
 		
 		self.navigationItem.rightBarButtonItems = [self.editButtonItem, actionButtonItem]
-		self.navigationItem.largeTitleDisplayMode = .never
+        self.navigationItem.largeTitleDisplayMode = .never
 		self.navigationController?.navigationBar.isTranslucent = false
 		
 		// Set up the table view
 		self.tableView.rowHeight = UITableView.automaticDimension
 		self.tableView.estimatedRowHeight = 44
+        // However this trick doesn't work here, but it did on the HomeViewController
+        // https://stackoverflow.com/questions/20305943/why-extra-space-is-at-top-of-uitableview-simple
+        // https://medium.com/@kuopingl/getting-rid-of-the-ignoring-top-space-in-uitableview-with-static-cells-d9b887b39006
+        // https://www.repeato.app/resolving-extra-padding-at-the-top-of-uitableview-with-uitableviewstylegrouped-in-ios7-and-later/
+        self.tableView.contentInsetAdjustmentBehavior = .never // fixes extra space above table when scrolling to top
 		self.tableView.tableFooterView = UIView()
-		
+        
 		// Configure the search controller
 		self.searchController.searchResultsUpdater = self
 		self.searchController.obscuresBackgroundDuringPresentation = false
@@ -125,7 +124,7 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 	// MARK: - IBActions
 	
 	@objc func shareButtonTapped(_ sender: UIBarButtonItem) {
-        Utilities.shareList(fileName: self.title ?? "", filePath: self.filePath, parentViewController: self)
+        Utilities.shareList(fileName: self.title ?? "", filePath: self.filePath, parentViewController: self, senderButton: sender)
 	}
 	
 	@IBAction func addItem(_ sender: AnyObject) {
@@ -544,33 +543,6 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
 			self.saveFile()
 		}
 	}
-	
-//	func openFile(filePath: String) -> [ListItem] {
-//		
-//		var tempRecords = [ListItem]()
-//		
-//		if FileManager.default.fileExists(atPath: filePath) {
-//			if let fileContents = NSDictionary(contentsOfFile: filePath) {
-//				
-//				// File records
-//				if let fileRecords = fileContents[Constants.File.Records] as? [[String: Any]] {
-//					for record in fileRecords {
-//						let newRecord = ListItem(data: record)
-//						tempRecords.append(newRecord)
-//					}
-//				}
-//				
-//				// Visibility state
-//				if let visibility = fileContents[Constants.File.Visibility] as? Int {
-//					if let tempVisibility = VisibilityState(rawValue: visibility) {
-//						self.visibilityState = tempVisibility
-//					}
-//				}
-//			}
-//		}
-//		
-//		return tempRecords
-//	}
 	
 	func saveFile() {
 		

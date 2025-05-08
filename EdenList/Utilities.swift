@@ -9,8 +9,7 @@ import UIKit
 
 class Utilities {
     
-    static func shareList(fileName: String, filePath: String, parentViewController: UIViewController) {
-        print("Welcome to \(#function)")
+    static func shareList(fileName: String, filePath: String, parentViewController: UIViewController, senderView: UIView? = nil, senderButton: UIBarButtonItem? = nil) {
         
         var records =  [ListItem]()
         let fileTitle = fileName
@@ -69,16 +68,22 @@ class Utilities {
         shareVC.excludedActivityTypes = excludedTypes
         shareVC.setValue(fileTitle, forKey: "subject")
         
+        // For iPad pop over
         if let popoverPresentationController = shareVC.popoverPresentationController {
-            // TODO: Fix this later
-            // popoverPresentationController.barButtonItem = sender
+            if let senderView = senderView {
+                // From the HomeViewController
+                popoverPresentationController.sourceView = senderView
+                popoverPresentationController.sourceRect = senderView.bounds
+            } else if let senderButton = senderButton {
+                // From the ListItemsViewController
+                popoverPresentationController.barButtonItem = senderButton
+            }
         }
         
         // If displaying the share sheet is slow, use the dispatch queue
         DispatchQueue.main.async() {
             parentViewController.present(shareVC, animated: true, completion: nil)
         }
-        
     }
     
     static func openFile(filePath: String) -> ([ListItem], VisibilityState) {
@@ -97,9 +102,7 @@ class Utilities {
                     }
                 }
                 
-                // FIXME: need to have some other form of modification
                 // Visibility state
-                
                 if let visibility = fileContents[Constants.File.Visibility] as? Int {
                     if let tempVisibility = VisibilityState(rawValue: visibility) {
                         visibilityState = tempVisibility

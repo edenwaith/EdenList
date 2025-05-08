@@ -29,7 +29,6 @@ class ListManager {
     }
 	
     func saveLists(lists: [String], pinnedLists: [String] = []) {
-        print("Saving pinnedLists:: \(pinnedLists)")
 		UserDefaults.standard.set(lists, forKey: "Lists")
         UserDefaults.standard.set(pinnedLists, forKey: "PinnedLists")
 		UserDefaults.standard.synchronize()

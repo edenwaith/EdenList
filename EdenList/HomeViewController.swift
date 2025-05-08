@@ -78,7 +78,7 @@ class HomeViewController: UITableViewController {
 		self.navigationItem.rightBarButtonItem = addButton
 		self.navigationItem.title = "EdenList".localize()
 		self.navigationController?.navigationBar.isTranslucent = false
-		
+        
 		// This is being used to avoid a weird shading during a transition in the navigation bar
 		if #available(iOS 13.0, *) {
 			let appearance = UINavigationBarAppearance()
@@ -87,11 +87,13 @@ class HomeViewController: UITableViewController {
 			self.navigationController?.navigationBar.standardAppearance = appearance
 			self.navigationController?.navigationBar.scrollEdgeAppearance = self.navigationController?.navigationBar.standardAppearance
 		}
-		
+        
 		// Don't display empty "cells"
 		self.tableView.rowHeight = UITableView.automaticDimension
 		self.tableView.estimatedRowHeight = 44
-        self.tableView.contentInsetAdjustmentBehavior = .never // fixes extra space above table when scrolling to top        
+        // Fixes extra space above table when scrolling to top
+        // Reference: https://www.repeato.app/resolving-extra-padding-at-the-top-of-uitableview-with-uitableviewstylegrouped-in-ios7-and-later/
+        self.tableView.contentInsetAdjustmentBehavior = .never
         self.tableView.tableFooterView = UIView()
         
 		// Configure the search controller
@@ -105,6 +107,11 @@ class HomeViewController: UITableViewController {
 		// Alternatives for placing the search controller: https://stackoverflow.com/questions/58727139/show-search-bar-in-navigation-bar-and-large-title-also-without-scrolling-on-ios
 		self.navigationItem.searchController = self.searchController
 		self.definesPresentationContext = true
+        
+        // Attempts to fix an odd popping animation when returning to the screen
+        // Check on this again, results are inconclusive
+        // self.edgesForExtendedLayout = .all //  [] // .top
+        // self.extendedLayoutIncludesOpaqueBars = true
 	}
 	
 	// MARK: - List Methods
@@ -433,7 +440,7 @@ class HomeViewController: UITableViewController {
             let writePath = NSURL(fileURLWithPath: documentsDirectory).appendingPathComponent(fileName)
             let selectedFilePath = (writePath?.path)!
             
-            Utilities.shareList(fileName: selectedFileName, filePath: selectedFilePath, parentViewController: self)
+            Utilities.shareList(fileName: selectedFileName, filePath: selectedFilePath, parentViewController: self, senderView: view)
             
             actionPerformed(true)
         }

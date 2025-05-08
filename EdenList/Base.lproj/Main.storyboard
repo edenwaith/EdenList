@@ -50,17 +50,17 @@
         <!--List Items View Controller-->
         <scene sceneID="Efg-gH-IaQ">
             <objects>
-                <viewController storyboardIdentifier="listItemsViewControllerID" id="19i-cR-fbc" customClass="ListItemsViewController" customModule="EdenList" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="listItemsViewControllerID" automaticallyAdjustsScrollViewInsets="NO" id="19i-cR-fbc" customClass="ListItemsViewController" customModule="EdenList" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9Ph-M4-slt">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="oBJ-CJ-BtA">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="oBJ-CJ-BtA">
                                 <rect key="frame" x="0.0" y="50" width="375" height="679"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="detailButton" indentationWidth="10" reuseIdentifier="listItemReuseID" textLabel="1m9-hA-3JH" detailTextLabel="ROs-Tm-pGZ" style="IBUITableViewCellStyleSubtitle" id="6RF-eh-egS">
-                                        <rect key="frame" x="0.0" y="50" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="55.333332061767578" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="6RF-eh-egS" id="FLT-Ou-Ieo">
                                             <rect key="frame" x="0.0" y="0.0" width="335" height="44"/>
