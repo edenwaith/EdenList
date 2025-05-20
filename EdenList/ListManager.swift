@@ -19,9 +19,18 @@ class ListManager {
 			return []
 		}
 	}
+    
+    func pinnedLists() -> [String] {
+        if let availableLists = UserDefaults.standard.array(forKey: "PinnedLists") as? [String] {
+            return availableLists
+        } else {
+            return []
+        }
+    }
 	
-	func saveLists(lists: [String]) {
+    func saveLists(lists: [String], pinnedLists: [String] = []) {
 		UserDefaults.standard.set(lists, forKey: "Lists")
+        UserDefaults.standard.set(pinnedLists, forKey: "PinnedLists")
 		UserDefaults.standard.synchronize()
 	}
 	

@@ -81,11 +81,15 @@ class EditItemViewController: UITableViewController {
 	/// Setup the input view accessory for the keyboard to easily cycle through the fields
 	func setupKeyboardToolbar() {
 
-		let dismissButton = UIBarButtonItem(image: UIImage(named: "close"), style: .plain, target: self, action: #selector(dismissKeyboard))
+        let closeImage = UIImage(systemName: "xmark")
+        let rightImage = UIImage(systemName: "chevron.right")
+        let leftImage = UIImage(systemName: "chevron.left") 
+        
+		let dismissButton = UIBarButtonItem(image: closeImage, style: .plain, target: self, action: #selector(dismissKeyboard))
 		let flexibleButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
 		let spaceButton = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-		let previousButton = UIBarButtonItem(image: UIImage(named: "arrow_left"), style: .plain, target: self, action: #selector(selectItemTextField))
-		let nextButton = UIBarButtonItem(image: UIImage(named: "arrow_right"), style: .plain, target: self, action: #selector(selectNotesTextField))
+		let previousButton = UIBarButtonItem(image: leftImage, style: .plain, target: self, action: #selector(selectItemTextField))
+		let nextButton = UIBarButtonItem(image: rightImage, style: .plain, target: self, action: #selector(selectNotesTextField))
 		
 		keyboardToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 44))
 		

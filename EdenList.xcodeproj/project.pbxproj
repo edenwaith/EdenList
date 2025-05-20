@@ -19,6 +19,9 @@
 		8445F61A1E6377110020744F /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8445F6191E6377110020744F /* ListItem.swift */; };
 		8445F61B1E6377110020744F /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8445F6191E6377110020744F /* ListItem.swift */; };
 		8445F61C1E6377110020744F /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8445F6191E6377110020744F /* ListItem.swift */; };
+		845400BF2D9B8AC200E8B655 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845400BE2D9B8ABD00E8B655 /* Utilities.swift */; };
+		845400C02D9B8AC200E8B655 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845400BE2D9B8ABD00E8B655 /* Utilities.swift */; };
+		845400C12D9B8AC200E8B655 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845400BE2D9B8ABD00E8B655 /* Utilities.swift */; };
 		8469E58F1E8DE47F00BC28B3 /* EditItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8469E58E1E8DE47F00BC28B3 /* EditItemTableViewCell.swift */; };
 		8469E5901E8DE47F00BC28B3 /* EditItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8469E58E1E8DE47F00BC28B3 /* EditItemTableViewCell.swift */; };
 		8492951B1E8CA59100AD3D45 /* String+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8492951A1E8CA59100AD3D45 /* String+Utils.swift */; };
@@ -72,6 +75,7 @@
 		842CF6531E540E7200BA2CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		842CF65F1E54135700BA2CDD /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		8445F6191E6377110020744F /* ListItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListItem.swift; sourceTree = "<group>"; };
+		845400BE2D9B8ABD00E8B655 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		8469E58E1E8DE47F00BC28B3 /* EditItemTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EditItemTableViewCell.swift; path = Views/EditItemTableViewCell.swift; sourceTree = "<group>"; };
 		8492951A1E8CA59100AD3D45 /* String+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String+Utils.swift"; path = "Extensions/String+Utils.swift"; sourceTree = "<group>"; };
 		8498E78C1E5A26A80090AB93 /* NameListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NameListViewController.swift; sourceTree = "<group>"; };
@@ -164,9 +168,9 @@
 			isa = PBXGroup;
 			children = (
 				842CF6311E540E7200BA2CDD /* AppDelegate.swift */,
-				849295191E8CA57100AD3D45 /* Extensions */,
 				849295181E8CA55900AD3D45 /* Managers */,
 				849295171E8CA55300AD3D45 /* Models */,
+				849295191E8CA57100AD3D45 /* Utilities */,
 				849295161E8CA53100AD3D45 /* View Controllers */,
 				8469E58D1E8DE44F00BC28B3 /* Views */,
 			);
@@ -217,13 +221,14 @@
 			name = Managers;
 			sourceTree = "<group>";
 		};
-		849295191E8CA57100AD3D45 /* Extensions */ = {
+		849295191E8CA57100AD3D45 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				845400BE2D9B8ABD00E8B655 /* Utilities.swift */,
 				8492951A1E8CA59100AD3D45 /* String+Utils.swift */,
 				3DF6DBF2244BED33004A4B38 /* UIColor+Utils.swift */,
 			);
-			name = Extensions;
+			name = Utilities;
 			sourceTree = "<group>";
 		};
 		84F370B1202E60C200BE467B /* Icons */ = {
@@ -246,6 +251,7 @@
 			buildPhases = (
 				842CF62A1E540E7200BA2CDD /* Sources */,
 				842CF62B1E540E7200BA2CDD /* Frameworks */,
+				848688092DAF5E320052E37E /* Update version string in LaunchScreen Storyboard */,
 				842CF62C1E540E7200BA2CDD /* Resources */,
 			);
 			buildRules = (
@@ -307,7 +313,7 @@
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 59RQ86687X;
 						LastSwiftMigration = 1120;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 0;
@@ -382,6 +388,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		848688092DAF5E320052E37E /* Update version string in LaunchScreen Storyboard */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Update version string in LaunchScreen Storyboard";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Reference: https://thoughtbot.com/blog/making-your-version-number-super-visible\n# Output version & build number to the APP_VERSION label on LaunchScreen.storyboard\nversionNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"${INFOPLIST_FILE}\")\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${INFOPLIST_FILE}\")\n\nsed -i \"\" -e \"/userLabel=\\\"APP_VERSION\\\"/s/text=\\\"[^\\\"]*\\\"/text=\\\" $MARKETING_VERSION\\\"/\" \"$PROJECT_DIR/$PROJECT_NAME/Base.lproj/LaunchScreen.storyboard\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		842CF62A1E540E7200BA2CDD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -389,6 +416,7 @@
 			files = (
 				8492951B1E8CA59100AD3D45 /* String+Utils.swift in Sources */,
 				8498E78D1E5A26A80090AB93 /* NameListViewController.swift in Sources */,
+				845400C02D9B8AC200E8B655 /* Utilities.swift in Sources */,
 				8445F61A1E6377110020744F /* ListItem.swift in Sources */,
 				84F1861E1E5E979400145007 /* EditItemViewController.swift in Sources */,
 				842CF6321E540E7200BA2CDD /* AppDelegate.swift in Sources */,
@@ -407,6 +435,7 @@
 				8492951C1E8CA59100AD3D45 /* String+Utils.swift in Sources */,
 				8445F61B1E6377110020744F /* ListItem.swift in Sources */,
 				842CF6471E540E7200BA2CDD /* EdenListTests.swift in Sources */,
+				845400BF2D9B8AC200E8B655 /* Utilities.swift in Sources */,
 				84F82C161E56B32E00051C55 /* ListManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -421,6 +450,7 @@
 				8469E5901E8DE47F00BC28B3 /* EditItemTableViewCell.swift in Sources */,
 				84F1861C1E5E978200145007 /* ListItemsViewController.swift in Sources */,
 				8498E78E1E5A26A80090AB93 /* NameListViewController.swift in Sources */,
+				845400C12D9B8AC200E8B655 /* Utilities.swift in Sources */,
 				84F1861F1E5E979400145007 /* EditItemViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -573,14 +603,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 2.3.2;
-				DEVELOPMENT_TEAM = 59RQ86687X;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2.4.0;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 59RQ86687X;
 				INFOPLIST_FILE = EdenList/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.3.2;
+				MARKETING_VERSION = 2.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.edenlist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Edenwaith Profile";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -591,14 +626,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 2.3.2;
-				DEVELOPMENT_TEAM = 59RQ86687X;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2.4.0;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 59RQ86687X;
 				INFOPLIST_FILE = EdenList/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.3.2;
+				MARKETING_VERSION = 2.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.edenwaith.edenlist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Edenwaith Profile";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
