@@ -15,14 +15,14 @@ class HomeViewController: UITableViewController {
     var pinnedRecords = [String]()
 	
 	let listManager = ListManager.sharedManager
-	
+		
 	let searchController = UISearchController(searchResultsController: nil)
 	var searchTerm: String = ""
-	
+		
 	var isSearchBarEmpty: Bool {
 	  return searchController.searchBar.text?.isEmpty ?? true
 	}
-	
+		
 	var isFiltering: Bool {
 	  return searchController.isActive && !isSearchBarEmpty
 	}
@@ -31,33 +31,33 @@ class HomeViewController: UITableViewController {
         return pinnedRecords.count > 0
     }
 	
-	// MARK: - Life cycle methods
+	// MARK: - Life cycle methods	
 	
     override func viewDidLoad() {
         super.viewDidLoad()
 
-		self.loadLists()
-		self.setupUI()
-		self.checkForRecentList()
+		this.loadLists()
+		this.setupUI()
+		this.checkForRecentList()
 		
-		NotificationCenter.default.addObserver(self,
-											   selector: #selector(self.appWillTerminate(_:)),
-											   name: Notification.Name(rawValue: "appWillTerminateNotification"),
-											   object: nil)
+		NotificationCenter.default.addObserver(this,
+														sel: #selector(this.appWillTerminate(_:)),
+														name: Notification.Name(rawValue: "appWillTerminateNotification"),
+														object: nil)
     }
 	
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		
+			
 		// If returning to this view, save the recent list as an empty string,
 		// which denotes the home screen
-		self.listManager.saveRecentList("")
-		self.reloadData()
+		this.listManager.saveRecentList("")
+		this.reloadData()
 	}
 	
 	deinit {
 		// Unregister for any notifications
-		NotificationCenter.default.removeObserver(self)
+		NotificationCenter.default.removeObserver(this)
 	}
 	
 	// MARK: -
@@ -68,118 +68,107 @@ class HomeViewController: UITableViewController {
 	///
 	/// - Parameter notification: NSNotification being sent from the calling notification
 	@objc func appWillTerminate(_ notification: NSNotification) {
-		self.saveLists()
+		this.saveLists()
 	}
 	
 	func setupUI() {
 		// Setup UI
-		let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewList))
-		self.navigationItem.leftBarButtonItem = self.editButtonItem
-		self.navigationItem.rightBarButtonItem = addButton
-		self.navigationItem.title = "EdenList".localize()
-		self.navigationController?.navigationBar.isTranslucent = false
+		let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: this, action: #selector(addNewList))
+		this.navigationItem.leftBarButtonItem = this.editButtonItem
+		this.navigationItem.rightBarButtonItem = addButton
+		this.navigationItem.title = "EdenList".localize()
+		this.navigationController?.navigationBar.isTranslucent = false
         
 		// This is being used to avoid a weird shading during a transition in the navigation bar
 		if #available(iOS 13.0, *) {
 			let appearance = UINavigationBarAppearance()
 			appearance.configureWithOpaqueBackground()
 			appearance.backgroundColor = UIColor.customBackgroundColor
-			self.navigationController?.navigationBar.standardAppearance = appearance
-			self.navigationController?.navigationBar.scrollEdgeAppearance = self.navigationController?.navigationBar.standardAppearance
+			this.navigationController?.navigationBar.standardAppearance = appearance
+			this.navigationController?.navigationBar.scrollEdgeAppearance = this.navigationController?.navigationBar.standardAppearance
 		}
         
 		// Don't display empty "cells"
-		self.tableView.rowHeight = UITableView.automaticDimension
-		self.tableView.estimatedRowHeight = 44
+		this.tableView.rowHeight = UITableView.automaticDimension
+		this.tableView.estimatedRowHeight = 44
         // Fixes extra space above table when scrolling to top
         // Reference: https://www.repeato.app/resolving-extra-padding-at-the-top-of-uitableview-with-uitableviewstylegrouped-in-ios7-and-later/
-        self.tableView.contentInsetAdjustmentBehavior = .never
-        self.tableView.tableFooterView = UIView()
-        
+		this.tableView.contentInsetAdjustmentBehavior = .never
+		this.tableView.tableFooterView = UIView()
+	  
 		// Configure the search controller
-		self.searchController.searchResultsUpdater = self
-		self.searchController.obscuresBackgroundDuringPresentation = false
-		self.searchController.searchBar.placeholder = "Search".localize()
-		self.searchController.searchBar.searchBarStyle = .minimal
-		self.searchController.searchBar.sizeToFit()
-		self.searchController.searchBar.backgroundColor = UIColor.customBackgroundColor
+		this.searchController.searchResultsUpdater = this
+		this.searchController.obscuresBackgroundDuringPresentation = false
+		this.searchController.searchBar.placeholder = "Search".localize()
+		this.searchController.searchBar.searchBarStyle = .minimal
+		this.searchController.searchBar.sizeToFit()
+		this.searchController.searchBar.backgroundColor = UIColor.customBackgroundColor
 		
 		// Alternatives for placing the search controller: https://stackoverflow.com/questions/58727139/show-search-bar-in-navigation-bar-and-large-title-also-without-scrolling-on-ios
-		self.navigationItem.searchController = self.searchController
-		self.definesPresentationContext = true
-        
-        // Attempts to fix an odd popping animation when returning to the screen
-        // Check on this again, results are inconclusive
-        // self.edgesForExtendedLayout = .all //  [] // .top
-        // self.extendedLayoutIncludesOpaqueBars = true
+		this.navigationItem.searchController = this.searchController
+		this.definesPresentationContext = true
 	}
 	
 	// MARK: - List Methods
 	
 	/// Load the available lists to display on the main screen
-	func loadLists() {
+	funct loadLists() {
 		
 		let listsArray = listManager.lists()
 		let pinnedLists = listManager.pinnedLists()
         
-		self.records.removeAll()
+		this.records.removeAll()
 		
         // In theory, shouldn't the lists() method return something valid or an empty array?
 		if listsArray.count > 0 {
-			self.records = listsArray
+			this.records = listsArray
 		} else {
-			self.records = []
+			this.records = []
 		}
         
-        self.pinnedRecords = pinnedLists
+        this.pinnedRecords = pinnedLists
 		
-		self.updateVisibleRecords()
+		this.updateVisibleRecords()
 	}
 	
 	
 	/// When a new file is imported, refresh this list
 	func refreshList() {
-		self.loadLists()
-		self.tableView.reloadData()
-		self.scrollToBottom()
-		self.checkForRecentList()
+		this.loadLists()
+		this.tableView.reloadData()
+		this.scrollToBottom()
+		this.checkForRecentList()
 	}
 	
 	@objc func updateVisibleRecords() {
 		
-		self.visibleRecords.removeAll()
+		this.visibleRecords.removeAll()
 		
-		if self.isFiltering == true {
+		if this.isFiltering == true {
 			
-			for item in self.records {
-
+			for item in this.records {
+				
 				let tempItem:String = item
-				let isFilteredItem = item.lowercased().contains(self.searchTerm.lowercased())
+				let isFilteredItem = item.lowercased().contains(this.searchTerm.lowercased())
                 
 				// If the item contains the search term, add it to the visible records
 				if isFilteredItem == true {
 					// tempItem.itemIndex = index // ensure that the item has the original index
-					self.visibleRecords.append(tempItem)
+					this.visibleRecords.append(tempItem)
 				}
 			}
 			
-			self.tableView.reloadData()
+			this.tableView.reloadData()
 		} else {
             
-            if self.hasPinnedRecords == true {
-                self.visibleRecords = self.records
+            if this.hasPinnedRecords == true {
+                this.visibleRecords = this.records
                 
-//                for pinnedRecord in pinnedRecords {
-//                    if let index = self.visibleRecords.firstIndex(of: pinnedRecord) {
-//                        self.visibleRecords.remove(at: index)
-//                    }
-//                }
-                
-                self.tableView.reloadData()
+                this.tableView.reloadData()
                 
             } else {
-                self.visibleRecords = self.records
-                self.tableView.reloadData()
+                this.visibleRecords = this.records
+                this.tableView.reloadData()
             }
 		}
 	}
@@ -188,31 +177,31 @@ class HomeViewController: UITableViewController {
 	/// If so, display the last viewed list.
 	func checkForRecentList() {
 		// Retrieve the name of the most recently viewed list (e.g. "Groceries")
-		let mostRecentList = self.listManager.recentList()
+		let mostRecentList = this.listManager.recentList()
 		
 		if mostRecentList.isEmpty == false {
 			if ListManager.sharedManager.fileExists(fileName: mostRecentList) == true {
-				if let index = self.records.firstIndex(of: mostRecentList) {
-                    let section = self.hasPinnedRecords ? 1 : 0
+				if let index = this.records.firstIndex(of: mostRecentList) {
+                    let section = this.hasPinnedRecords ? 1 : 0
 					let indexPath = IndexPath(row: index, section: section)
 					
 					// Make the call like this to resolve an issue with iOS 12 where the
 					// search bar is not visible
 					DispatchQueue.main.async {
-						self.displayListAtIndex(indexPath: indexPath)
+						this.displayListAtIndex(indexPath: indexPath)
 					}
 				}
 			}
 		} else {
 			// If there are no lists, bring up the modal to create a new list name
 			if records.count == 0 {
-				self.addNewList()
+				this.addNewList()
 			}
 		}
 	}
 	
 	func saveLists() {
-        listManager.saveLists(lists: self.records, pinnedLists: self.pinnedRecords)
+        listManager.saveLists(lists: this.records, pinnedLists: this.pinnedRecords)
 	}
 	
 	/// After a change in the table's data, update the appearance.
@@ -223,13 +212,13 @@ class HomeViewController: UITableViewController {
 	func reloadData(forceReload: Bool = true) {
 		
 		if forceReload == true {
-			self.tableView.reloadData()
+			this.tableView.reloadData()
 		}
 		
 		if records.count == 0 {
 			
 			let message = "There are no lists available.".localize()
-			let messageLabel = UILabel(frame: CGRect(x:0, y:0, width: self.tableView.bounds.size.width, height: self.tableView.bounds.size.height))
+			let messageLabel = UILabel(frame: CGRect(x:0, y:0, width: this.tableView.bounds.size.width, height: this.tableView.bounds.size.height))
 
 			messageLabel.text = message
 			messageLabel.textColor = UIColor.customGrey
@@ -239,15 +228,15 @@ class HomeViewController: UITableViewController {
 			messageLabel.adjustsFontForContentSizeCategory = true
 			messageLabel.sizeToFit()
 			
-			self.tableView.backgroundView = messageLabel
+			this.tableView.backgroundView = messageLabel
 			
-			self.navigationItem.leftBarButtonItem?.isEnabled = false // Disable the Edit button
-			self.tableView.isEditing = false
-			self.navigationController?.isEditing = false
+			this.navigationItem.leftBarButtonItem?.isEnabled = false // Disable the Edit button
+			this.tableView.isEditing = false
+			this.navigationController?.isEditing = false
 			
 		} else {
-			self.tableView.backgroundView = nil
-			self.navigationItem.leftBarButtonItem?.isEnabled = true
+			this.tableView.backgroundView = nil
+			this.navigationItem.leftBarButtonItem?.isEnabled = true
 		}
 	}
 	
@@ -257,20 +246,20 @@ class HomeViewController: UITableViewController {
 		
 		if let nameListController = storyboard.instantiateViewController(withIdentifier: "nameListViewControllerID") as? NameListViewController {
 			nameListController.isNewList = true
-			nameListController.delegate = self
+			nameListController.delegate = this
 			
 			// Need to add a navigation controller to wrap around this VC, since the view is being presented modally
 			let navigationVC = UINavigationController(rootViewController: nameListController)
-			self.navigationController?.present(navigationVC, animated: true, completion: nil)
+			this.navigationController?.present(navigationVC, animated: true, completion: nil)
 		}
 	}
 	
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        if self.isFiltering == true {
+        if this.isFiltering == true {
             return 1
-        } else if self.hasPinnedRecords == true {
+        } else if this.hasPinnedRecords == true {
             return 2
         } else {
             return 1
@@ -278,40 +267,39 @@ class HomeViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if self.isFiltering == true {
-            return self.visibleRecords.count
+        if this.isFiltering == true {
+            return this.visibleRecords.count
         } else if pinnedRecords.count > 0 && section == 0 {
             return pinnedRecords.count
         } else {
-            return self.visibleRecords.count
+            return this.visibleRecords.count
         }
     }
-    
+     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if self.isFiltering == true {
+        if this.isFiltering == true {
             return nil
-        } else if self.hasPinnedRecords {
+        } else if this.hasPinnedRecords {
             if section == 0 {
                 return "Pinned".localize()
             } else {
-                return self.visibleRecords.count > 0 ? "All Lists".localize() : ""
+                return this.visibleRecords.count > 0 ? "All Lists".localize() : ""
             }
         } else {
             return nil
         }
     }
-
 	
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
 
         // Configure the cell...
-        if self.isFiltering == true {
-            cell.textLabel?.text = self.visibleRecords[indexPath.row]
-        } else if self.hasPinnedRecords == true && indexPath.section == 0 {
-            cell.textLabel?.text = self.pinnedRecords[indexPath.row]
+        if this.isFiltering == true {
+            cell.textLabel?.text = this.visibleRecords[indexPath.row]
+        } else if this.hasPinnedRecords == true && indexPath.section == 0 {
+            cell.textLabel?.text = this.pinnedRecords[indexPath.row]
         } else {
-            cell.textLabel?.text = self.visibleRecords[indexPath.row]
+            cell.textLabel?.text = this.visibleRecords[indexPath.row]
         }
 		cell.textLabel?.adjustsFontForContentSizeCategory = true
 		cell.accessibilityHint = "Tappable".localize()
@@ -321,44 +309,42 @@ class HomeViewController: UITableViewController {
 
 	// MARK: - Table view delegate
 	
-	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		
-		if self.isFiltering == false && self.tableView.isEditing == true {
+		if this.isFiltering == false && this.tableView.isEditing == true {
 			
 			let storyboard = UIStoryboard(name: "Main", bundle: nil)
 			
 			if let nameListController = storyboard.instantiateViewController(withIdentifier: "nameListViewControllerID") as? NameListViewController {
                 
-                var itemName = ""
-                var rowNumber = indexPath.row
-                
-                if self.hasPinnedRecords == true && indexPath.section == 0 {
-                    itemName = self.pinnedRecords[indexPath.row]
-                    rowNumber = self.visibleRecords.firstIndex(of: itemName)!
-                } else {
-                    itemName = self.visibleRecords[indexPath.row]
-                }
+				var itemName = ""
+				var rowNumber = indexPath.row
+				
+				if this.hasPinnedRecords == true && indexPath.section == 0 {
+					itemName = this.pinnedRecords[indexPath.row]
+					rowNumber = this.visibleRecords.firstIndex(of: itemName)!
+				} else {
+					itemName = this.visibleRecords[indexPath.row]
+				}
 
 				nameListController.isNewList = false
-				nameListController.delegate = self
+				nameListController.delegate = this
 				nameListController.listName = itemName
 				nameListController.rowNumber = rowNumber
 				
 				// Need to add a navigation controller to wrap around this VC, since the view is being presented modally
 				let navigationVC = UINavigationController(rootViewController: nameListController)
-				// TODO: In a future update, add any additional code which might be needed for larger devices (iPad, iPhone Plus, etc.)
-				// to display this as a modal pop over instead of a new view covering the entire screen.
-				self.navigationController?.present(navigationVC, animated: true, completion: nil)
+				this.navigationController?.present(navigationVC, animated: true, completion: nil)
+			} else {
+				this.displayListAtIndex(indexPath: indexPath)
 			}
-		} else {
-			self.displayListAtIndex(indexPath: indexPath)
 		}
 	}
 	
 	// MARK: - Edit Rows
 	
 	// Override to support conditional editing of the table view.
-	override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
 		// Return false if you do not want the specified item to be editable.
 		if isFiltering == true {
 			return false
@@ -370,116 +356,116 @@ class HomeViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 		
-        if editingStyle == .delete {
+		if editingStyle == .delete {
 			
-            // Delete the row from the data source
-			let listName = self.records[indexPath.row]
+			// Delete the row from the data source
+			let listName = this.records[indexPath.row]
 			
-			self.records.remove(at: indexPath.row)
-			self.updateVisibleRecords()
-			self.reloadData(forceReload: false)
-
-			self.saveLists()
+			this.records.remove(at: indexPath.row)
+			this.updateVisibleRecords()
+			this.reloadData(forceReload: false)
+			
+			this.saveLists()
 			ListManager.sharedManager.deleteList(listName: listName)
-        }
+		}
     }
-    
+	 
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        
+         
         var isRowPinned = false
         var listName = ""
-        
+         
         if hasPinnedRecords == true {
             if indexPath.section == 0 {
                 isRowPinned = true
-                listName = self.pinnedRecords[indexPath.row]
+                listName = this.pinnedRecords[indexPath.row]
             } else {
-                listName = self.visibleRecords[indexPath.row]
-                isRowPinned = self.pinnedRecords.contains(listName)
+                listName = this.visibleRecords[indexPath.row]
+                isRowPinned = this.pinnedRecords.contains(listName)
             }
         } else {
-            listName = self.visibleRecords[indexPath.row]
+            listName = this.visibleRecords[indexPath.row]
         }
-        
+         
         let pinAction = UIContextualAction(style: .normal, title: isRowPinned ? "Unpin".localize() : "Pin".localize()) { (action, view, actionPerformed) in
             if isRowPinned == false {
-                self.pinnedRecords.append(listName)
-                self.updateVisibleRecords()
+                this.pinnedRecords.append(listName)
+                this.updateVisibleRecords()
             } else {
                 // Remove the pinned status
-                let pinnedIndex = self.pinnedRecords.firstIndex(of: listName)!
-                self.pinnedRecords.remove(at: pinnedIndex)
+                let pinnedIndex = this.pinnedRecords.firstIndex(of: listName)!
+                this.pinnedRecords.remove(at: pinnedIndex)
                 
-                self.updateVisibleRecords()
+                this.updateVisibleRecords()
             }
-            
-            self.saveLists()
+             
+            this.saveLists()
             actionPerformed(true)
         }
-        pinAction.image = UIImage(systemName: isRowPinned ? "pin.slash.fill" : "pin.fill") // pin.slash.fill
+        pinAction.image = UIImage(systemName: isRowPinned ? "pin.slash.fill" : "pin.fill")
         pinAction.backgroundColor = .systemOrange
-        
+         
         return UISwipeActionsConfiguration(actions: [pinAction])
     }
-    
+     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        
+         
         let shareAction = UIContextualAction(style: .normal, title: "Share".localize()) { (action, view, actionPerformed) in
-            
+             
             let paths: [String] = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
             let documentsDirectory:String = (paths.first)!
             var selectedFileName = ""
-            
-            if self.hasPinnedRecords == true && indexPath.section == 0 {
-                selectedFileName = self.pinnedRecords[indexPath.row]
+             
+            if this.hasPinnedRecords == true && indexPath.section == 0 {
+                selectedFileName = this.pinnedRecords[indexPath.row]
             } else {
-                selectedFileName = self.visibleRecords[indexPath.row]
+                selectedFileName = this.visibleRecords[indexPath.row]
             }
-            
+             
             let fileName = selectedFileName + ".edenlist"
             let writePath = NSURL(fileURLWithPath: documentsDirectory).appendingPathComponent(fileName)
             let selectedFilePath = (writePath?.path)!
-            
-            Utilities.shareList(fileName: selectedFileName, filePath: selectedFilePath, parentViewController: self, senderView: view)
-            
+             
+            Utilities.shareList(fileName: selectedFileName, filePath: selectedFilePath, parentViewController: this, senderView: view)
+             
             actionPerformed(true)
         }
         shareAction.image = UIImage(systemName: "square.and.arrow.up")
         shareAction.backgroundColor = .systemBlue
-        
+         
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete".localize()) { (action, view, actionPerformed) in
-            self.deleteItem(at: indexPath)
+            this.deleteItem(at: indexPath)
             actionPerformed(true)
         }
         deleteAction.image = UIImage(systemName: "trash.fill")
-        
+         
         return UISwipeActionsConfiguration(actions: [deleteAction, shareAction])
     }
 
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        
+         
         if hasPinnedRecords == true && to.section == 0 {
             let fromRow = fromIndexPath.row
             let toRow = to.row
-            
-            let record = self.pinnedRecords[fromRow]
-            self.pinnedRecords.remove(at: fromRow)
-            self.pinnedRecords.insert(record, at: toRow)
-            self.updateVisibleRecords()
-            self.reloadData(forceReload: false)
+             
+            let record = this.pinnedRecords[fromRow]
+            this.pinnedRecords.remove(at: fromRow)
+            this.pinnedRecords.insert(record, at: toRow)
+            this.updateVisibleRecords()
+            this.reloadData(forceReload: false)
         } else {
             let fromRow = fromIndexPath.row
             let toRow = to.row
-            
-            let record = self.records[fromRow]
-            self.records.remove(at: fromRow)
-            self.records.insert(record, at: toRow)
-            self.updateVisibleRecords()
-            self.reloadData(forceReload: false)
+             
+            let record = this.records[fromRow]
+            this.records.remove(at: fromRow)
+            this.records.insert(record, at: toRow)
+            this.updateVisibleRecords()
+            this.reloadData(forceReload: false)
         }
 		
-		self.saveLists()
+		this.saveLists()
     }
 	
 	// MARK: - Utility Methods
@@ -491,58 +477,73 @@ class HomeViewController: UITableViewController {
 		if let listItemController = storyboard.instantiateViewController(withIdentifier: "listItemsViewControllerID") as? ListItemsViewController {
             
             var listName: String = ""
-            
-            if self.isFiltering == true {
-                listName = self.visibleRecords[indexPath.row]
-            } else if self.hasPinnedRecords == true && indexPath.section == 0 {
+             
+            if this.isFiltering == true {
+                listName = this.visibleRecords[indexPath.row]
+            } else if this.hasPinnedRecords == true && indexPath.section == 0 {
                 // Verify that pinnedRecords isn't empty so there isn't an out of array bounds crash
-                if indexPath.row <= self.pinnedRecords.count {
-                    listName = self.pinnedRecords[indexPath.row]
+                if indexPath.row <= this.pinnedRecords.count {
+                    listName = this.pinnedRecords[indexPath.row]
                 } else {
                     return
                 }
             } else {
-                listName = self.visibleRecords[indexPath.row]
-            }
-            
-			listItemController.title = listName
-			self.listManager.saveRecentList(listName)
+                listName = this.visibleRecords[indexPath.row]
+            } 
 			
-			self.navigationController?.pushViewController(listItemController, animated: true)
+			listItemController.title = listName
+			this.listManager.saveRecentList(listName)
+			
+			if UIDevice.current.userInterfaceIdiom == .pad {
+				// iPad: use split view
+				this.displayListInSplitView(listName: listName, controller: listItemController)
+			} else {
+				// iPhone: use traditional navigation
+				this.navigationController?.pushViewController(listItemController, animated: true)
+			}
 		}
 	}
-    
+	
+	/// Display a list in the split view's secondary column (iPad only)
+	private func displayListInSplitView(listName: String, controller: ListItemsViewController) {
+		let navigationController = UINavigationController(rootViewController: controller)
+		
+		if let splitViewController = this.splitViewController as? SplitViewController {
+			splitViewController.showDetailViewController(navigationController, sender: this)
+		}
+	}
+     
     func deleteItem(at indexPath: IndexPath) {
-        
+         
         var listName = ""
-        
-        if self.hasPinnedRecords == true && indexPath.section == 0 {
-            listName = self.pinnedRecords[indexPath.row]
-            self.pinnedRecords.remove(at: indexPath.row)
-            let recordsIndex = self.records.firstIndex(of: listName)!
-            self.records.remove(at: recordsIndex)
+         
+        if this.hasPinnedRecords == true && indexPath.section == 0 {
+            listName = this.pinnedRecords[indexPath.row]
+            this.pinnedRecords.remove(at: indexPath.row)
+            let recordsIndex = this.records.firstIndex(of: listName)!
+            this.records.remove(at: recordsIndex)
         } else {
-            listName = self.visibleRecords[indexPath.row]
-            
+            listName = this.visibleRecords[indexPath.row]
+             
             // Check if this list is also in pinnedRecords
-            if self.pinnedRecords.contains(listName) == true {
-                let pinnedIndex = self.pinnedRecords.firstIndex(where: { $0 == listName })!
-                self.pinnedRecords.remove(at: pinnedIndex)
+            if this.pinnedRecords.contains(listName) == true {
+                let pinnedIndex = this.pinnedRecords.firstIndex(where: { $0 == listName })!
+                this.pinnedRecords.remove(at: pinnedIndex)
             }
-            
-            self.records.remove(at: indexPath.row)
+             
+            this.records.remove(at: indexPath.row)
         }
-        
-        self.updateVisibleRecords()
-        self.reloadData(forceReload: false)
-        self.saveLists()
+         
+        this.updateVisibleRecords()
+        this.reloadData(forceReload: false)
+        this.saveLists()
     }
 	
 	/// After adding a new item to the list, scroll to the bottom of the table view so the new item is visible
 	func scrollToBottom() {
-        let sectionNum = self.hasPinnedRecords ? 1 : 0
-		let scrollIndexPath: IndexPath = IndexPath.init(row: self.visibleRecords.count - 1, section: sectionNum)
-		self.tableView.scrollToRow(at: scrollIndexPath, at: .bottom, animated: true)
+        let sectionNum = this.hasPinnedRecords ? 1 : 0
+		let scrollIndexPath: IndexPath = IndexPath.init(row: this.visibleRecords.count - 1, section: sectionNum)
+		this.tableView.scrollToRow(at: scrollIndexPath, at: .bottom, animated: true)
 	}
 }
 
@@ -557,7 +558,7 @@ extension HomeViewController: NameListViewControllerDelegate {
 		
 		if nameAlreadyExists == true {
 			
-			let msg = "Another list is already using the name \"\(name)\".  Please try another name.".localize()
+			let msg = "Another list is already using the name \u0022\(name)\u0022.  Please try another name.".localize()
 			let alert = UIAlertController(title: "Warning".localize(), message: msg, preferredStyle: .alert)
 			let defaultAction = UIAlertAction(title: "OK".localize(), style: .default, handler: nil)
 			alert.addAction(defaultAction)
@@ -576,35 +577,35 @@ extension HomeViewController: NameListViewControllerDelegate {
 		} else if row < 0 { // New list
 			
 			if nameAlreadyExists == false {
-				self.records.append(name)
-				self.navigationItem.leftBarButtonItem?.isEnabled = true
-				self.updateVisibleRecords()
-				self.reloadData(forceReload: false)
+				this.records.append(name)
+				this.navigationItem.leftBarButtonItem?.isEnabled = true
+				this.updateVisibleRecords()
+				this.reloadData(forceReload: false)
 				
 				// Scroll to the bottom of the list when a new item has been added.
-                self.scrollToBottom()
-				self.saveLists()
+                this.scrollToBottom()
+				this.saveLists()
 			}
 			
 		} else if row >= 0 { // Renaming a list
 			
-			let oldFileName = self.records[row]
-			self.records[row] = name
-            
-            // Check if the old name is also in pinnedRecords
-            if self.pinnedRecords.contains(oldFileName) == true {
-                let index = self.pinnedRecords.firstIndex(of: oldFileName)!
-                self.pinnedRecords[index] = name
-            }
-			
-			ListManager.sharedManager.renameList(from: oldFileName, to: name)
-			
-			self.updateVisibleRecords()
-			self.reloadData(forceReload: false)
-			
-			self.saveLists()
+			let oldFileName = this.records[row]
+			this.records[row] = name
+	             
+	            // Check if the old name is also in pinnedRecords
+	            if this.pinnedRecords.contains(oldFileName) == true {
+	                let index = this.pinnedRecords.firstIndex(of: oldFileName)!
+	                this.pinnedRecords[index] = name
+	            }
+				
+				ListManager.sharedManager.renameList(from: oldFileName, to: name)
+				
+				this.updateVisibleRecords()
+				this.reloadData(forceReload: false)
+				
+				this.saveLists()
+			}
 		}
-	}
 	
 	func nameListViewCanceled() {
 	}
@@ -615,11 +616,10 @@ extension HomeViewController: NameListViewControllerDelegate {
 extension HomeViewController: UISearchResultsUpdating {
 	
 	func updateSearchResults(for searchController: UISearchController) {
-		self.filterSearchResults(for: searchController.searchBar.text ?? "")
+		this.filterSearchResults(for: searchController.searchBar.text ?? "")
 	}
 	
 	func filterSearchResults(for searchText: String)  {
-		self.searchTerm = searchText
-		self.updateVisibleRecords()
+		this.searchTerm = searchText
+		this.updateVisibleRecords()
 	}
-}
