@@ -54,6 +54,19 @@ class HomeViewController: UITableViewController {
 		self.listManager.saveRecentList("")
 		self.reloadData()
 	}
+    
+    // This is a fix due to the large title leading margin was incorrect, causing the large title to be
+    // flush against the left margin.  This started to happen when the UIDesignRequiresCompatibility
+    // key was added to the Info.plist.  Remove this once Liquid Glass is supported.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let navBar = self.navigationController?.navigationBar {
+            // Force standard system margins (typically 16 or 20 points)
+            navBar.layoutMargins.left = 16
+            navBar.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+        }
+    }
 	
 	deinit {
 		// Unregister for any notifications
@@ -73,7 +86,7 @@ class HomeViewController: UITableViewController {
 	
 	func setupUI() {
 		// Setup UI
-		let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewList))
+		let addButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(addNewList))
 		self.navigationItem.leftBarButtonItem = self.editButtonItem
 		self.navigationItem.rightBarButtonItem = addButton
 		self.navigationItem.title = "EdenList".localize()

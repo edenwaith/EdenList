@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="bKT-CW-dIN">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="bKT-CW-dIN">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -56,7 +56,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="oBJ-CJ-BtA">
-                                <rect key="frame" x="0.0" y="50" width="375" height="679"/>
+                                <rect key="frame" x="0.0" y="100" width="375" height="596"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="detailButton" indentationWidth="10" reuseIdentifier="listItemReuseID" textLabel="1m9-hA-3JH" detailTextLabel="ROs-Tm-pGZ" style="IBUITableViewCellStyleSubtitle" id="6RF-eh-egS">
@@ -90,7 +90,7 @@
                                 </connections>
                             </tableView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nhE-IV-x4S">
-                                <rect key="frame" x="0.0" y="729" width="375" height="49"/>
+                                <rect key="frame" x="0.0" y="696" width="375" height="48"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <items>
                                     <barButtonItem systemItem="trash" id="eSv-mg-qEd">
@@ -100,8 +100,8 @@
                                     </barButtonItem>
                                     <barButtonItem systemItem="flexibleSpace" id="6Rr-VR-iS8"/>
                                     <barButtonItem style="plain" id="K51-IX-dcs">
-                                        <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="iO0-qT-WGp">
-                                            <rect key="frame" x="99" y="11" width="177" height="32"/>
+                                        <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="iO0-qT-WGp">
+                                            <rect key="frame" x="91.666666666666657" y="0.0" width="191.99999999999997" height="48"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <segments>
                                                 <segment title="All"/>
@@ -113,7 +113,7 @@
                                         </segmentedControl>
                                     </barButtonItem>
                                     <barButtonItem systemItem="flexibleSpace" id="ehp-gh-j1m"/>
-                                    <barButtonItem systemItem="add" id="SFA-Xf-VqK">
+                                    <barButtonItem systemItem="compose" id="SFA-Xf-VqK">
                                         <connections>
                                             <action selector="addItem:" destination="19i-cR-fbc" id="Wkl-uF-uBT"/>
                                         </connections>
@@ -262,7 +262,7 @@
             <objects>
                 <navigationController id="bKT-CW-dIN" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="0W7-qt-JjL">
-                        <rect key="frame" x="0.0" y="50" width="375" height="96"/>
+                        <rect key="frame" x="0.0" y="100" width="375" height="106"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </navigationBar>

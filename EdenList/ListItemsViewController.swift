@@ -104,6 +104,10 @@ class ListItemsViewController: UIViewController, UITableViewDataSource, UITableV
         self.tableView.contentInsetAdjustmentBehavior = .never // fixes extra space above table when scrolling to top
 		self.tableView.tableFooterView = UIView()
         
+        // In code or via your Storyboard/XIB, add a strict height constraint
+        // This is necessary when the UIDesignRequiresCompatibility flag is set to YES in Info.plist
+        organizationControl.heightAnchor.constraint(equalToConstant: 32.0).isActive = true
+        
 		// Configure the search controller
 		self.searchController.searchResultsUpdater = self
 		self.searchController.obscuresBackgroundDuringPresentation = false
