@@ -19,6 +19,32 @@ class HomeViewController: UITableViewController {
 	let searchController = UISearchController(searchResultsController: nil)
 	var searchTerm: String = ""
 	
+	// Shown when there are no lists. Previously this was a fresh UILabel assigned
+	// to tableView.backgroundView on every reloadData() call, sized to
+	// tableView.bounds.size at that moment. That worked on a plain full-screen
+	// iPhone nav stack, but under the split-view migration (where this screen can
+	// be a narrower sidebar column, and the column's width can change after this
+	// code runs) it kept rendering left-aligned in a too-narrow, stale-sized box —
+	// and neither an autoresizingMask nor Auto Layout constraints anchored to
+	// tableView fixed it, which points to tableView.backgroundView itself
+	// re-framing its contents internally rather than respecting a subview's own
+	// constraints. Using a plain subview of the view controller's own view (not
+	// tableView.backgroundView) sidesteps that entirely — this is a standard,
+	// well-understood UIKit pattern with no framework-internal auto-sizing to
+	// fight against.
+	private lazy var emptyStateLabel: UILabel = {
+		let label = UILabel()
+		label.text = "There are no lists available.".localize()
+		label.textColor = UIColor.customGrey
+		label.numberOfLines = 0
+		label.textAlignment = .center
+		label.font = UIFont.preferredFont(forTextStyle: .body)
+		label.adjustsFontForContentSizeCategory = true
+		label.translatesAutoresizingMaskIntoConstraints = false
+		label.isHidden = true
+		return label
+	}()
+	
 	var isSearchBarEmpty: Bool {
 	  return searchController.searchBar.text?.isEmpty ?? true
 	}
@@ -125,6 +151,14 @@ class HomeViewController: UITableViewController {
         // Check on this again, results are inconclusive
         // self.edgesForExtendedLayout = .all //  [] // .top
         // self.extendedLayoutIncludesOpaqueBars = true
+        
+        self.view.addSubview(self.emptyStateLabel)
+        NSLayoutConstraint.activate([
+            self.emptyStateLabel.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
+            self.emptyStateLabel.centerYAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerYAnchor),
+            self.emptyStateLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 32),
+            self.emptyStateLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -32)
+        ])
 	}
 	
 	// MARK: - List Methods
@@ -241,25 +275,14 @@ class HomeViewController: UITableViewController {
 		
 		if records.count == 0 {
 			
-			let message = "There are no lists available.".localize()
-			let messageLabel = UILabel(frame: CGRect(x:0, y:0, width: self.tableView.bounds.size.width, height: self.tableView.bounds.size.height))
-
-			messageLabel.text = message
-			messageLabel.textColor = UIColor.customGrey
-			messageLabel.numberOfLines = 0;
-			messageLabel.textAlignment = .center;
-			messageLabel.font = UIFont.preferredFont(forTextStyle: .body)
-			messageLabel.adjustsFontForContentSizeCategory = true
-			messageLabel.sizeToFit()
-			
-			self.tableView.backgroundView = messageLabel
+			self.emptyStateLabel.isHidden = false
 			
 			self.navigationItem.leftBarButtonItem?.isEnabled = false // Disable the Edit button
 			self.tableView.isEditing = false
 			self.navigationController?.isEditing = false
 			
 		} else {
-			self.tableView.backgroundView = nil
+			self.emptyStateLabel.isHidden = true
 			self.navigationItem.leftBarButtonItem?.isEnabled = true
 		}
 	}
