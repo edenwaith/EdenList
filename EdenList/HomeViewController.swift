@@ -521,7 +521,29 @@ class HomeViewController: UITableViewController {
 			listItemController.title = listName
 			self.listManager.saveRecentList(listName)
 			
-			self.navigationController?.pushViewController(listItemController, animated: true)
+			if let splitViewController = self.splitViewController, splitViewController.isCollapsed {
+				// Compact width (iPhone): the split view is collapsed to a single
+				// visible column, so push directly onto that column's navigation
+				// controller — the same push transition as before this migration.
+				//
+				// (Previously this always wrapped listItemController in a brand new
+				// UINavigationController and set it as the .secondary column, then
+				// called show(.secondary). That's correct for the expanded/iPad case,
+				// but while collapsed, show(.secondary) pushes whatever object is
+				// assigned to .secondary onto the visible stack as-is — pushing a
+				// UINavigationController onto another UINavigationController isn't a
+				// supported configuration, and produced the corrupted-looking
+				// navigation bar / search bar area under the nav bar.)
+				if let visibleNavigationController = splitViewController.viewController(for: .primary) as? UINavigationController {
+					visibleNavigationController.pushViewController(listItemController, animated: true)
+				}
+			} else {
+				// Regular width (iPad): give the detail column its own navigation
+				// controller so it keeps its own nav bar and back stack, separate
+				// from the sidebar.
+				let secondaryNavigationController = UINavigationController(rootViewController: listItemController)
+				self.splitViewController?.setViewController(secondaryNavigationController, for: .secondary)
+			}
 		}
 	}
     
