@@ -19,6 +19,32 @@ class HomeViewController: UITableViewController {
 	let searchController = UISearchController(searchResultsController: nil)
 	var searchTerm: String = ""
 	
+	// Shown when there are no lists. Previously this was a fresh UILabel assigned
+	// to tableView.backgroundView on every reloadData() call, sized to
+	// tableView.bounds.size at that moment. That worked on a plain full-screen
+	// iPhone nav stack, but under the split-view migration (where this screen can
+	// be a narrower sidebar column, and the column's width can change after this
+	// code runs) it kept rendering left-aligned in a too-narrow, stale-sized box —
+	// and neither an autoresizingMask nor Auto Layout constraints anchored to
+	// tableView fixed it, which points to tableView.backgroundView itself
+	// re-framing its contents internally rather than respecting a subview's own
+	// constraints. Using a plain subview of the view controller's own view (not
+	// tableView.backgroundView) sidesteps that entirely — this is a standard,
+	// well-understood UIKit pattern with no framework-internal auto-sizing to
+	// fight against.
+	private lazy var emptyStateLabel: UILabel = {
+		let label = UILabel()
+		label.text = "There are no lists available.".localize()
+		label.textColor = UIColor.customGrey
+		label.numberOfLines = 0
+		label.textAlignment = .center
+		label.font = UIFont.preferredFont(forTextStyle: .body)
+		label.adjustsFontForContentSizeCategory = true
+		label.translatesAutoresizingMaskIntoConstraints = false
+		label.isHidden = true
+		return label
+	}()
+	
 	var isSearchBarEmpty: Bool {
 	  return searchController.searchBar.text?.isEmpty ?? true
 	}
@@ -54,6 +80,19 @@ class HomeViewController: UITableViewController {
 		self.listManager.saveRecentList("")
 		self.reloadData()
 	}
+    
+    // This is a fix due to the large title leading margin was incorrect, causing the large title to be
+    // flush against the left margin.  This started to happen when the UIDesignRequiresCompatibility
+    // key was added to the Info.plist.  Remove this once Liquid Glass is supported.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let navBar = self.navigationController?.navigationBar {
+            // Force standard system margins (typically 16 or 20 points)
+            navBar.layoutMargins.left = 16
+            navBar.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+        }
+    }
 	
 	deinit {
 		// Unregister for any notifications
@@ -73,7 +112,7 @@ class HomeViewController: UITableViewController {
 	
 	func setupUI() {
 		// Setup UI
-		let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewList))
+		let addButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(addNewList))
 		self.navigationItem.leftBarButtonItem = self.editButtonItem
 		self.navigationItem.rightBarButtonItem = addButton
 		self.navigationItem.title = "EdenList".localize()
@@ -112,6 +151,14 @@ class HomeViewController: UITableViewController {
         // Check on this again, results are inconclusive
         // self.edgesForExtendedLayout = .all //  [] // .top
         // self.extendedLayoutIncludesOpaqueBars = true
+        
+        self.view.addSubview(self.emptyStateLabel)
+        NSLayoutConstraint.activate([
+            self.emptyStateLabel.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor),
+            self.emptyStateLabel.centerYAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerYAnchor),
+            self.emptyStateLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 32),
+            self.emptyStateLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -32)
+        ])
 	}
 	
 	// MARK: - List Methods
@@ -228,25 +275,14 @@ class HomeViewController: UITableViewController {
 		
 		if records.count == 0 {
 			
-			let message = "There are no lists available.".localize()
-			let messageLabel = UILabel(frame: CGRect(x:0, y:0, width: self.tableView.bounds.size.width, height: self.tableView.bounds.size.height))
-
-			messageLabel.text = message
-			messageLabel.textColor = UIColor.customGrey
-			messageLabel.numberOfLines = 0;
-			messageLabel.textAlignment = .center;
-			messageLabel.font = UIFont.preferredFont(forTextStyle: .body)
-			messageLabel.adjustsFontForContentSizeCategory = true
-			messageLabel.sizeToFit()
-			
-			self.tableView.backgroundView = messageLabel
+			self.emptyStateLabel.isHidden = false
 			
 			self.navigationItem.leftBarButtonItem?.isEnabled = false // Disable the Edit button
 			self.tableView.isEditing = false
 			self.navigationController?.isEditing = false
 			
 		} else {
-			self.tableView.backgroundView = nil
+			self.emptyStateLabel.isHidden = true
 			self.navigationItem.leftBarButtonItem?.isEnabled = true
 		}
 	}
@@ -508,7 +544,29 @@ class HomeViewController: UITableViewController {
 			listItemController.title = listName
 			self.listManager.saveRecentList(listName)
 			
-			self.navigationController?.pushViewController(listItemController, animated: true)
+			if let splitViewController = self.splitViewController, splitViewController.isCollapsed {
+				// Compact width (iPhone): the split view is collapsed to a single
+				// visible column, so push directly onto that column's navigation
+				// controller — the same push transition as before this migration.
+				//
+				// (Previously this always wrapped listItemController in a brand new
+				// UINavigationController and set it as the .secondary column, then
+				// called show(.secondary). That's correct for the expanded/iPad case,
+				// but while collapsed, show(.secondary) pushes whatever object is
+				// assigned to .secondary onto the visible stack as-is — pushing a
+				// UINavigationController onto another UINavigationController isn't a
+				// supported configuration, and produced the corrupted-looking
+				// navigation bar / search bar area under the nav bar.)
+				if let visibleNavigationController = splitViewController.viewController(for: .primary) as? UINavigationController {
+					visibleNavigationController.pushViewController(listItemController, animated: true)
+				}
+			} else {
+				// Regular width (iPad): give the detail column its own navigation
+				// controller so it keeps its own nav bar and back stack, separate
+				// from the sidebar.
+				let secondaryNavigationController = UINavigationController(rootViewController: listItemController)
+				self.splitViewController?.setViewController(secondaryNavigationController, for: .secondary)
+			}
 		}
 	}
     
